@@ -4,6 +4,8 @@
 #include "common.h"
 #include "vectors.h"
 
+#define MAX_DEG 1000
+
 typedef vector_t polynome_t;
 
 #define polynome_zero(deg) vect_zero(deg + 1)
@@ -26,9 +28,9 @@ polynome_t polynome_diff(polynome_t p);
 
 polynome_t polynome_diff_ordre_n(polynome_t p, size_t n);
 
-polynome_t polynome_taylor(polynome_t p);
-
 void polynome_print(polynome_t p, char* variable);
+
+complexe_t polynomial_fonction(polynome_t p, complexe_t x);
 
 vector_t polynome_racines(polynome_t p);
 

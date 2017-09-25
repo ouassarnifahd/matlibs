@@ -29,6 +29,10 @@ bool complexe_is_imaginary(complexe_t z) {
     return !z.alg.ztab[0] && z.alg.ztab[1];
 }
 
+complexe_t complexe_inv(complexe_t z) {
+    return complexe_mult(real_new(-1), z);
+}
+
 complexe_t complexe_add(complexe_t z1, complexe_t z2) {
     return complexe_new(z1.alg.ztab[0] + z2.alg.ztab[0], z1.alg.ztab[1] + z2.alg.ztab[1]);
 }
@@ -36,6 +40,11 @@ complexe_t complexe_add(complexe_t z1, complexe_t z2) {
 complexe_t complexe_mult(complexe_t z1, complexe_t z2) { // z1 * z2 = (a1 * a2 - b1 * b2) + i * (a1 * b2 + a2 * b1)
     return complexe_new(z1.alg.ztab[0] * z2.alg.ztab[0] - z1.alg.ztab[1] * z2.alg.ztab[1],
                         z1.alg.ztab[0] * z2.alg.ztab[1] + z1.alg.ztab[1] * z2.alg.ztab[0]);
+}
+
+complexe_t complexe_div(complexe_t z1, complexe_t z2) { // z1 / z2 = ((a1 * a2 + b1 * b2) + i * (b1 * a2 - a1 * b2))/(a2 * a2 + b2 * b2)
+    return complexe_new((z1.alg.ztab[0] * z2.alg.ztab[0] + z1.alg.ztab[1] * z2.alg.ztab[1])/(z2.alg.ztab[0] * z2.alg.ztab[0] + z2.alg.ztab[1] * z2.alg.ztab[1]),
+                        (z1.alg.ztab[1] * z2.alg.ztab[0] - z1.alg.ztab[0] * z2.alg.ztab[1])/(z2.alg.ztab[0] * z2.alg.ztab[0] + z2.alg.ztab[1] * z2.alg.ztab[1]));
 }
 
 complexe_t complexe_pow(complexe_t z, size_t pow) {

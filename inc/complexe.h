@@ -4,7 +4,6 @@
 #include "common.h"
 
 typedef union {
-    bool is_exp;
     union {
         double ztab[2];
         struct {
@@ -24,19 +23,27 @@ complexe_t complexe_new(double real, double imaginary);
 
 #define imaginary_new(nbre) complexe_new(0, nbre)
 
-complexe_t complexe_alg2exp(complexe_t z);
-
-complexe_t complexe_exp2alg(complexe_t z);
-
 bool complexe_is_null(complexe_t z);
 
 bool complexe_is_real(complexe_t z);
 
 bool complexe_is_imaginary(complexe_t z);
 
+double getreal(complexe_t z);
+
+double getimaginary(complexe_t z);
+
+complexe_t complexe_inv(complexe_t z);
+
+complexe_t complexe_alg2exp(complexe_t z);
+
+complexe_t complexe_exp2alg(complexe_t z);
+
 complexe_t complexe_add(complexe_t z1, complexe_t z2);
 
 complexe_t complexe_mult(complexe_t z1, complexe_t z2);
+
+complexe_t complexe_div(complexe_t z1, complexe_t z2);
 
 complexe_t complexe_pow(complexe_t z, size_t pow);
 

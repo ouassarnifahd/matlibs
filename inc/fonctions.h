@@ -5,7 +5,9 @@
 #include "complexe.h"
 #include "vectors.h"
 #include "polynome.h"
-#include "matrix.h"
+// #include "matrix.h"
+
+#define STEP 1e-6
 
 // enum lib_taylor {
 //     SIN,
@@ -33,63 +35,57 @@ typedef complexe_t (*flinear_t) (vector_t);
 typedef vector_t (*fvect_t) (vector_t);
 
 // Cn2 -> Cn2
-typedef matrix_t (*fmatrix_t) (matrix_t);
-
-fcomplexe_t complexe_fonctions[] = {
-    // base
-    complexe_inv,
-    complexe_pow2,
-    complexe_sqrt,
-    // Trigo
-    complexe_sin,
-    complexe_arcsin,
-    complexe_cos,
-    complexe_arccos,
-    complexe_tan,
-    complexe_arctan,
-    // logarithmic
-    complexe_log,
-    complexe_exp,
-    // hyperbolic
-    complexe_sinh,
-    complexe_arcsinh,
-    complexe_cosh,
-    complexe_arccosh,
-    complexe_tanh,
-    complexe_arctanh
-};
-
-fpolynomial_t polynome_fonctions[] = {
-    &polynomial_fonction,
-};
-
-fvect_t vect_fonctions[] = {
-    // base
-    &vect_pow2,
-    &vect_sqrt,
-    &vect_norme,
-    // Trigo
-    &vect_sin,
-    &vect_arcsin,
-    &vect_cos,
-    &vect_arccos,
-    &vect_tan,
-    &vect_arctan,
-    // logarithmic
-    &vect_log,
-    &vect_exp,
-    // hyperbolic
-    &vect_sinh,
-    &vect_arcsinh,
-    &vect_cosh,
-    &vect_arccosh,
-    &vect_tanh,
-    &vect_arctanh
-};
+// typedef matrix_t (*fmatrix_t) (matrix_t);
+//
+// fcomplexe_t complexe_fonctions[] = {
+//     // base
+//     complexe_inv,
+//     complexe_pow2,
+//     complexe_sqrt,
+//     // Trigo
+//     complexe_sin,
+//     complexe_arcsin,
+//     complexe_cos,
+//     complexe_arccos,
+//     complexe_tan,
+//     complexe_arctan,
+//     // logarithmic
+//     complexe_log,
+//     complexe_exp,
+//     // hyperbolic
+//     complexe_sinh,
+//     complexe_arcsinh,
+//     complexe_cosh,
+//     complexe_arccosh,
+//     complexe_tanh,
+//     complexe_arctanh
+// };
+//
+// fvect_t vect_fonctions[] = {
+//     // base
+//     &vect_pow2,
+//     &vect_sqrt,
+//     &vect_norme,
+//     // Trigo
+//     &vect_sin,
+//     &vect_arcsin,
+//     &vect_cos,
+//     &vect_arccos,
+//     &vect_tan,
+//     &vect_arctan,
+//     // logarithmic
+//     &vect_log,
+//     &vect_exp,
+//     // hyperbolic
+//     &vect_sinh,
+//     &vect_arcsinh,
+//     &vect_cosh,
+//     &vect_arccosh,
+//     &vect_tanh,
+//     &vect_arctanh
+// };
 
 complexe_t fcomplexe_diff_ordre_n(fcomplexe_t fx, size_t n, complexe_t x0);
-
-complexe_t polynomial_fonction(polynome_t p, complexe_t x);
 
 polynome_t taylor_fonction(fcomplexe_t fx, complexe_t a);
 
