@@ -36,7 +36,7 @@ typedef vector_t (*fvect_t) (vector_t);
 
 // Cn2 -> Cn2
 // typedef matrix_t (*fmatrix_t) (matrix_t);
-//
+
 // fcomplexe_t complexe_fonctions[] = {
 //     // base
 //     complexe_inv,
@@ -60,7 +60,7 @@ typedef vector_t (*fvect_t) (vector_t);
 //     complexe_tanh,
 //     complexe_arctanh
 // };
-//
+
 // fvect_t vect_fonctions[] = {
 //     // base
 //     &vect_pow2,
@@ -87,7 +87,7 @@ typedef vector_t (*fvect_t) (vector_t);
 
 complexe_t fcomplexe_diff_ordre_n(fcomplexe_t fx, size_t n, complexe_t x0);
 
-polynome_t taylor_fonction(fcomplexe_t fx, complexe_t a);
+polynome_t taylor_fonction(fcomplexe_t fx, size_t ordre, complexe_t a);
 
 fcomplexe_t fcomplexe_o(fcomplexe_t gx, fcomplexe_t fx);
 

@@ -71,8 +71,9 @@ void complexe_print(complexe_t z) {
 }
 
 void complexe_mem_view(complexe_t z) {
-    printf("complexe_t z:\n");
-    printf("\tz.alg:\n");
+    printf("complexe_t ");
+    complexe_print(z);
+    printf("\n\tz.alg:\n");
     printf("\t  ztab[0]   = %lf\n", z.alg.ztab[0]);
     printf("\t  ztab[1]   = %lf\n", z.alg.ztab[1]);
     printf("\tz.alg.zReIm:\n");

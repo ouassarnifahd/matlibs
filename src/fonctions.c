@@ -30,17 +30,18 @@ vector_t vect_pow2(vector_t vect) {
 
 // Polynome
 polynome_t taylor_fonction(fcomplexe_t fx, size_t ordre, complexe_t a) {
-    polynome_t taylor = polynome_zero(MAX_DEG);
+    polynome_t taylor = polynome_zero(ordre);
     polynome_t tmp = polynome_new(1, complexe_inv(a), real_new(1));
-    polynome_t tmp_power = polynome_zero(MAX_DEG);
+    polynome_t tmp_power = polynome_zero(ordre);
     tmp_power = polynome_add(tmp_power, tmp);
-    complexe_t fact = real_new(1);
-    for (size_t i = 0; i < taylor.size; i++) {
-        fact = complexe_mult(fact, real_new(i + 1));
-        printf("fact(%d) = ", i); complexe_print(fact);
-        printf("\nP%d = ", i); polynome_print(tmp_power, "X");
-        tmp_power = polynome_mult_polynome(tmp, tmp_power);
-        taylor = polynome_add(taylor, polynome_mult(tmp_power, complexe_div(fcomplexe_diff_ordre_n(fx, i, a), fact)));
+    unsigned int fact = 1;
+    for (size_t i = 0; i < ordre; i++) {
+        printf("fact(%zu) = %u\n", i, fact);
+        printf("P%zu = ", i); polynome_print(tmp_power, "X");
+        tmp_power = polynome_mult_polynome(tmp_power, tmp);
+        printf("T%zu = ", i); polynome_print(taylor, "X");
+        taylor = polynome_add(taylor, polynome_mult(tmp_power, complexe_div(fcomplexe_diff_ordre_n(fx, i, a), real_new(fact))));
+        fact *= i + 1;
     }
     polynome_delete(tmp);
     polynome_delete(tmp_power);
@@ -74,12 +75,20 @@ polynome_t taylor_fonction(fcomplexe_t fx, size_t ordre, complexe_t a) {
 #include <math.h>
 
 complexe_t complexe_sin(complexe_t z) {
-    return real_new(exp(z.alg.zReIm.real));
+    return real_new(cos(z.alg.zReIm.real));
 }
 
 int main(int argc, char const *argv[]) {
-    polynome_t polynome_sin = taylor_fonction(complexe_sin, real_new(1));
-    polynome_print(polynome_sin, "X");
+    polynome_t p = polynome_new(1, real_new(1), real_new(1));
+    printf("P  = "); polynome_print(p, "X");
+    polynome_t pa = polynome_pow(p, 2);
+    printf("Pa = "); polynome_print(pa, "X");
+    polynome_delete(p);
+    polynome_delete(pa);
+    // polynome_t polynome_sin = taylor_fonction(complexe_sin, 5, real_new(1));
+    // polynome_print(polynome_sin, "X");
+    // complexe_t sin1 = polynomial_fonction(polynome_sin, real_new(1));
+    // complexe_mem_view(sin1);
     return 0;
 }
 #endif

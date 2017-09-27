@@ -17,6 +17,7 @@ polynome_t polynome_diff(polynome_t p) {
     return diff;
 }
 
+// A revoir
 polynome_t polynome_diff_ordre_n(polynome_t p, size_t n) {
     if (n == 0) {
         return p;

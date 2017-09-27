@@ -29,9 +29,9 @@ bool complexe_is_real(complexe_t z);
 
 bool complexe_is_imaginary(complexe_t z);
 
-double getreal(complexe_t z);
+double getReal(complexe_t z);
 
-double getimaginary(complexe_t z);
+double getImaginary(complexe_t z);
 
 complexe_t complexe_inv(complexe_t z);
 

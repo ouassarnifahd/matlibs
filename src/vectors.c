@@ -49,11 +49,13 @@ void vect_print(vector_t vect) {
 }
 
 vector_t vect_add(vector_t vect1, vector_t vect2) {
-    vect1.size = Mat_min(vect1.size, vect2.size);
-    for (size_t i = 0; i < vect1.size; i++) {
-        vect1.vector[i] = complexe_add(vect1.vector[i], vect2.vector[i]);
+    vector_t vect = vect_zero(Mat_max(vect1.size, vect2.size));
+    for (size_t i = 0; i < vect.size; i++) {
+        if (vect1.size < i) vect.vector[i] = vect2.vector[i];
+        if (vect2.size < i) vect.vector[i] = vect1.vector[i];
+        else vect.vector[i] = complexe_add(vect1.vector[i], vect2.vector[i]);
     }
-    return vect1;
+    return vect;
 }
 
 vector_t vect_mult(vector_t vect, complexe_t scalar) {
@@ -92,7 +94,7 @@ vector_t vect_cauchy_mult(vector_t vect1, vector_t vect2) {
                 complexe_print(vect1.vector[k]);
                 printf(" * ");
                 complexe_print(vect2.vector[i - k]);
-                printf(" (k=%zu) (i-k=%zu)\n", k, i-k);
+                printf(" (k=%zu) (i-k=%zu)\n", k, i - k);
             #endif
             if (k < vect1.size && (i-k) < vect2.size) {
                 vect.vector[i] = complexe_add(vect.vector[i], complexe_mult(vect1.vector[k], vect2.vector[i - k]));
