@@ -1,14 +1,18 @@
 #general
 CC    		:= gcc
+CLC			:= openclc
 RM			:= rm -rf
 MKDIR 		:= mkdir -p
-wFlag 		:= -Wall
-srcPath		:= src
+wFlags 		:= -Wall -O0
+Archs 		:= -arch x86_64
+Frameworks 	:= -framework OpenCL
+srcPath	    := src
+clPath		:= cl
 incPath		:= inc
 objPath		:= obj
 binPath		:= bin
 debugPath	:= debug
-Project		:= time_sort
+Project		:= matlib
 
 #Debug
 dbgFlags	:= $(wFlag) -D DEBUG
@@ -21,10 +25,19 @@ PURPLE		:= \033[0;35m
 NOCOLOR		:= \033[0m
 
 #common
+inc 		:= $(wildcard $(incPath)/*.h)
 src  		:= $(wildcard $(srcPath)/*.c)
+kernels		:= $(wildcard $(clPath)/*.cl)
+
 obj  		:= $(src:$(srcPath)/%c=%o)
 
-all: mrproper build
+# all: mrproper build
+
+help:
+	@echo "the project is in developement"
+	@echo "make ./$(debugPath)/srcfile.dbg objects=\"object.o files.o dependencies.o if_there_is_any.o\""
+	@echo "NB: srcfile.c should have a main function in the DEBUG macro space"
+	@echo "ie: ./$(debugPath)/polynome.dbg objects=\"complexe.o vectors.o\""
 
 $(debugPath)/%.dbg: $(srcPath)/%.c $(inc)
 	@$(MAKE) directory path=$(dir $@)
@@ -39,13 +52,9 @@ $(debugPath)/%.o: $(srcPath)/%.c
 	@$(MAKE) directory path=$(dir $@)
 	@$(MAKE) compile OBJ='yes' CFlags="$(Flags)" out=$@ in=$<
 
-$(objPath)/$(type)/%.o: $(srcPath)/%.c
+$(objPath)/%.o: $(srcPath)/%.c
 	@$(MAKE) directory path=$(dir $@)
 	@$(MAKE) compile OBJ='yes' CFlags="$(Flags)" out=$@ in=$<
-
-$(binPath)/$(Project)_$(type): $(objPath)/$(type)/$(Project).o
-	@$(MAKE) directory path=$(dir $@)
-	@$(MAKE) compile OBJ='no' CFlags=$(wFlag) out=$@ objects="$(wildcard $(objPath)/*.o) $(staticOBJ) $<";
 
 $(objPath)/$(type)/$(Project).o: $(srcPath)/main.c
 	@$(MAKE) directory path=$(dir $@)

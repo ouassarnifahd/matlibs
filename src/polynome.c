@@ -9,6 +9,19 @@ polynome_t polynome_pow(polynome_t p, size_t n) {
     return power;
 }
 
+polynome_t polynome_add(polynome_t p1, polynome_t p2) {
+    polynome_t add = polynome_zero(Mat_max(p1.size, p2.size) - 1);
+    printf("dp1 %zu, dp2 %zu, dadd %zu\n", p1.size, p2.size, add.size);
+    for (size_t i = 0; i < add.size - 1; i++) {
+        if (p1.size < i) add.vector[i] = p2.vector[i];
+        if (p2.size < i) add.vector[i] = p1.vector[i];
+        else add.vector[i] = complexe_add(p1.vector[i], p2.vector[i]);
+        printf("x%zu = ", i);
+        complexe_print(add.vector[i]); printf("\n");
+    }
+    return add;
+}
+
 polynome_t polynome_diff(polynome_t p) {
     polynome_t diff = polynome_zero(p.size - 1);
     for (size_t i = 0; i < diff.size - 1; i++) {

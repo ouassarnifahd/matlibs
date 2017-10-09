@@ -2,53 +2,61 @@
 #define COMPLEXE_H
 
 #include "common.h"
+#include "real.h"
 
-typedef union {
+typedef union complexe {
     union {
-        double ztab[2];
+        real_t ztab[2];
         struct {
-            double real;
-            double imaginary;
+            real_t real;
+            real_t imaginary;
         } zReIm;
     } alg;
     struct {
-        double norme;
-        double argument;
+        real_t norme;
+        real_t argument;
     } exp;
-} complexe_t;
+} *complexe_t;
 
-complexe_t complexe_new(double real, double imaginary);
+#define SIZE_COMPLEXE sizeof(union complexe)
 
-#define real_new(nbre) complexe_new(nbre, 0)
+void* complexe_new(double real, double imaginary);
 
-#define imaginary_new(nbre) complexe_new(0, nbre)
+void complexe_delete(void* z);
 
-bool complexe_is_null(complexe_t z);
+void complexe_zero(void* z);
 
-bool complexe_is_real(complexe_t z);
+void complexe_one(void* z);
 
-bool complexe_is_imaginary(complexe_t z);
+void complexe_i(void* z);
 
-double getReal(complexe_t z);
+void complexe_inv(void* z);
 
-double getImaginary(complexe_t z);
+bool complexe_is_null(const void* z);
 
-complexe_t complexe_inv(complexe_t z);
+bool complexe_is_real(const void* z);
 
-complexe_t complexe_alg2exp(complexe_t z);
+bool complexe_is_imaginary(const void* z);
 
-complexe_t complexe_exp2alg(complexe_t z);
+void complexe_add(const void* z1, const void* z2, void* res);
 
-complexe_t complexe_add(complexe_t z1, complexe_t z2);
+void complexe_sub(const void* z1, const void* z2, void* res);
 
-complexe_t complexe_mult(complexe_t z1, complexe_t z2);
+void complexe_mult(const void* z1, const void* z2, void* res);
 
-complexe_t complexe_div(complexe_t z1, complexe_t z2);
+void complexe_div(const void* z1, const void* z2, void* res);
 
-complexe_t complexe_pow(complexe_t z, size_t pow);
+void complexe_pow(const void* z, size_t pow, void* res);
 
-void complexe_print(complexe_t z);
+void complexe_print(const void* z);
 
-void complexe_mem_view(complexe_t z);
+const struct math complexe_entity = {
+    SIZE_COMPLEXE,
+    (math_new_t)complexe_new,
+    complexe_delete, complexe_zero, complexe_one, complexe_inv,
+    complexe_is_null, NULL, NULL,
+    complexe_add, complexe_sub, complexe_mult, complexe_div,
+    complexe_print
+};
 
 #endif /* end of include guard: COMPLEXE_H */

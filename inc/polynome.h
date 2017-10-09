@@ -16,7 +16,7 @@ typedef vector_t polynome_t;
 
 #define polynome_delete(p) vect_delete(p)
 
-#define polynome_add(p1, p2) vect_add(p1, p2)
+polynome_t polynome_add(polynome_t p1, polynome_t p2);
 
 #define polynome_mult(p, a) vect_mult(p, a)
 

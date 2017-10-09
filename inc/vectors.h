@@ -3,31 +3,33 @@
 
 #include "common.h"
 #include "complexe.h"
+#include "entity.h"
 
-typedef struct {
+typedef struct vect {
     size_t size;
-    complexe_t* vector;
-} vector_t;
+    math_entity_t ent;
+    void* vector;
+}* vector_t;
 
-vector_t vect_zero(size_t size);
+vector_t vect_zero(size_t size, math_entity_t ent);
 
-vector_t vect_one(size_t size);
+vector_t vect_one(size_t size, math_entity_t ent);
 
-vector_t vect_new(size_t size, ...);
+vector_t vect_new(size_t size, math_entity_t ent, ...);
 
 size_t getSize(vector_t vect);
 
 void vect_delete(vector_t vect);
 
-vector_t vect_add(vector_t vect1, vector_t vect2);
+void vect_add(const vector_t vect1, const vector_t vect2, vector_t res, void (*add)(const void*, const void*, void*));
 
-vector_t vect_mult(vector_t vect, complexe_t scalar);
+vector_t vect_mult(vector_t vect, void (*mult)(void*, void*));
 
-vector_t vect_mult_vect(vector_t vect1, vector_t vect2);
+vector_t vect_mult_vect(const vector_t vect1, const vector_t vect2, vector_t res, void (*mult)(const void*, const void*, void*));
 
 vector_t vect_cauchy_mult(vector_t vect1, vector_t vect2);
 
-complexe_t vect_dot(vector_t vect1, vector_t vect2);
+complexe_t vect_dot(vector_t vect1, vector_t vect2 );
 
 complexe_t vect_sigma(vector_t vect);
 

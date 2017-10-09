@@ -1,31 +1,33 @@
 #include "vectors.h"
 
-vector_t vect_zero(size_t size) {
-    vector_t vect;
-    vect.size = size;
-    vect.vector = malloc(size * sizeof(complexe_t));
+vector_t vect_zero(size_t size, math_entity_t ent) {
+    vector_t vect = malloc(sizeof(struct vect));
+    vect->size = size;
+    vect->size_element = size_element;
+    vect->vector = malloc(size * size_element);
     for (size_t i = 0; i < size; i++) {
-        vect.vector[i] = real_new(0);
+        zero((void*)((char*)vect->vector + i * size_element));
     }
     return vect;
 }
 
-vector_t vect_one(size_t size) {
-    vector_t vect;
-    vect.size = size;
-    vect.vector = malloc(size * sizeof(complexe_t));
+vector_t vect_one(size_t size, math_entity_t ent) {
+    vector_t vect = malloc(sizeof(struct vect));
+    vect->ent = ent;
+    vect->size = size;
+    vect->vector = malloc(size * ent->size_element);
     for (size_t i = 0; i < size; i++) {
-        vect.vector[i] = real_new(1);
+        one((void*)((char*)vect->vector + i * size_element));
     }
     return vect;
 }
 
-vector_t vect_new(size_t size, ...) {
+vector_t vect_new(size_t size, math_entity_t ent, ...) {
     va_list args;
-    vector_t vect = vect_zero(size);
-    va_start(args, size);
+    vector_t vect = vect_zero(size, size_element, zero);
+    va_start(args);
     for (size_t i = 0; i < size; i++) {
-        vect.vector[i] = va_arg(args, complexe_t);
+        vect->vector[i] = va_arg(args, void*);
     }
     va_end(args);
     return vect;

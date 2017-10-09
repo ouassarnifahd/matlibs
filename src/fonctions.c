@@ -81,7 +81,7 @@ complexe_t complexe_sin(complexe_t z) {
 int main(int argc, char const *argv[]) {
     polynome_t p = polynome_new(1, real_new(1), real_new(1));
     printf("P  = "); polynome_print(p, "X");
-    polynome_t pa = polynome_pow(p, 2);
+    polynome_t pa = polynome_pow(p, 3);
     printf("Pa = "); polynome_print(pa, "X");
     polynome_delete(p);
     polynome_delete(pa);
