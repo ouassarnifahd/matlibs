@@ -1,5 +1,14 @@
 #include "complexe.h"
 
+const struct math complexe_entity = {
+    SIZE_COMPLEXE,
+    (math_new_t)complexe_new,
+    complexe_delete, complexe_zero, complexe_one, complexe_inv,
+    complexe_is_null, NULL, NULL,
+    complexe_add, complexe_sub, complexe_mult, complexe_div,
+    complexe_print
+};
+
 void* complexe_new(double real, double imaginary) {
     complexe_t new = malloc(sizeof(complexe_t));
     new->alg.ztab[0] = real_new(real);

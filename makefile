@@ -45,7 +45,7 @@ $(debugPath)/%.dbg: $(srcPath)/%.c $(inc)
 		$(MAKE) $(addprefix $(debugPath)/,$(objects)) Flags="$(Flags)"; \
 		$(MAKE) compile OBJ=no CFlags="$(dbgFlags) $(Flags)" out=$@ objects="$(addprefix $(debugPath)/,$(objects)) $<" 2> $(basename $@).err; \
 	else \
-		$(MAKE) compile OBJ=yes CFlags="$(dbgFlags) $(Flags)" out=$@ in=$< 2> $(basename $@).err; \
+		$(MAKE) compile OBJ=no CFlags="$(dbgFlags) $(Flags)" out=$@ objects=$< 2> $(basename $@).err; \
 	fi;
 
 $(debugPath)/%.o: $(srcPath)/%.c

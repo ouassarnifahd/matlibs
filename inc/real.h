@@ -42,13 +42,4 @@ void real_div(const void* x1, const void* x2, void* res);
 
 void real_print(const void* x);
 
-// const struct math real_entity = {
-//     SIZE_REAL,
-//     (math_new_t)real_new,
-//     real_delete, real_zero, real_one, real_inv,
-//     real_is_null, real_is_positive, real_is_negative,
-//     real_add, real_sub, real_mult, real_div,
-//     real_print
-// };
-
 #endif /* end of include guard: REAL_H */
