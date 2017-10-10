@@ -2,7 +2,6 @@
 #define VECTORS_H
 
 #include "common.h"
-#include "complexe.h"
 #include "entity.h"
 
 typedef struct vect {
@@ -11,28 +10,28 @@ typedef struct vect {
     void* vector;
 }* vector_t;
 
-vector_t vect_zero(size_t size, math_entity_t ent);
+void* vect_new(size_t size, math_entity_t ent, ...);
 
-vector_t vect_one(size_t size, math_entity_t ent);
+void vect_delete(void* vect);
 
-vector_t vect_new(size_t size, math_entity_t ent, ...);
+void vect_zero(void* x);
 
-size_t getSize(vector_t vect);
+void vect_one(void* x);
 
-void vect_delete(vector_t vect);
+void vect_inv(void* x);
 
-void vect_add(const vector_t vect1, const vector_t vect2, vector_t res, void (*add)(const void*, const void*, void*));
+void vect_add(const void* vect1, const void* vect2, void* res);
 
-vector_t vect_mult(vector_t vect, void (*mult)(void*, void*));
+void vect_mult(const void* vect, const void* scalar, void* res);
 
-vector_t vect_mult_vect(const vector_t vect1, const vector_t vect2, vector_t res, void (*mult)(const void*, const void*, void*));
+void vect_mult_vect(const void* vect1, const void* vect2, void* res);
 
-vector_t vect_cauchy_mult(vector_t vect1, vector_t vect2);
+void vect_cauchy_mult(const void* vect1, const void* vect2, void* res);
 
-complexe_t vect_dot(vector_t vect1, vector_t vect2 );
+void vect_dot(const void* vect1, const void* vect2 , void* res);
 
-complexe_t vect_sigma(vector_t vect);
+void vect_sigma(const void* vect, void* res);
 
-complexe_t vect_pigma(vector_t vect);
+void vect_pigma(const void* vect, void* res);
 
 #endif /* end of include guard: VECTORS_H */
