@@ -130,6 +130,15 @@ void vect_print(const void* x) {
     }
 }
 
+void vect_print_ligne(const void* x) {
+    vector_t vect = (const vector_t)x;
+    printf("\n\t");
+    for (size_t i = 0; i < vect->size; ++i) {
+        vect->ent->print((char*)vect->vector + i * vect->ent->size_element);
+        if (i != vect->size - 1) printf("   ");
+    }
+}
+
 #ifdef DEBUG
 #include "complexe.h"
 #include "real.h"
@@ -156,16 +165,66 @@ const struct math real_entity = {
 
 typedef void* (*math_real_new_t) (double);
 
+const struct math vect_entity = {
+    SIZE_VECT,
+    (math_new_t)vect_new,
+    vect_delete, vect_zero, vect_one, vect_inv,
+    NULL, NULL, NULL,
+    vect_add, NULL, vect_mult, NULL,
+    vect_print_ligne
+};
+
+typedef void* (*math_vect_new_t) (size_t, math_entity_t, ...);
+
 int main(int argc, char const *argv[]) {
-    math_entity_t entity = &complexe_entity;
-    vector_t vect1 = vect_new(2, entity, ((math_complexe_new_t)entity->new)(1, 1), ((math_complexe_new_t)entity->new)(1, -1));
-    vector_t vect2 = vect_new(2, entity, ((math_complexe_new_t)entity->new)(1, 1), ((math_complexe_new_t)entity->new)(1, 1));
-    vector_t vect12 = vect_new(3, entity, ((math_complexe_new_t)entity->new)(0, 0), ((math_complexe_new_t)entity->new)(0, 0), ((math_complexe_new_t)entity->new)(0, 1));
+    math_entity_t top_entity = &vect_entity, entity = &real_entity;
+    math_vect_new_t new = vect_new, top_ent_new = top_entity->new;
+    math_real_new_t ent_new = entity->new;
+    math_methode_t top_ent_delete = top_entity->delete, ent_delete = entity->delete;
+    math_methode_t delete = vect_delete;
+    math_print_t print = vect_print;
+
+    void* V11 = ent_new(1);
+    void* V12 = ent_new(0);
+    void* V1 = top_ent_new(2, entity, V11, V12);
+
+    void* V21 = ent_new(0);
+    void* V22 = ent_new(1);
+    void* V2 = top_ent_new(2, entity, V21, V22);
+
+    void* vect1 = new(2, top_entity, V1, V2);
+
+    void* W11 = ent_new(1);
+    void* W12 = ent_new(0);
+    void* W1 = top_ent_new(2, entity, W11, W12);
+
+    void* W21 = ent_new(0);
+    void* W22 = ent_new(1);
+    void* W2 = top_ent_new(2, entity, W21, W22);
+
+    void* vect2 = new(2, top_entity, W1, W2);
+
+    void* X11 = ent_new(0);
+    void* X12 = ent_new(0);
+    void* X1 = top_ent_new(2, entity, X11, X12);
+
+    void* X21 = ent_new(0);
+    void* X22 = ent_new(0);
+    void* X2 = top_ent_new(2, entity, X21, X22);
+
+    void* vect12 = new(2, top_entity, X1, X2);
+
     vect_add(vect1, vect2, vect12);
-    vect_print(vect12);
-    vect_delete(vect1);
-    vect_delete(vect2);
-    vect_delete(vect12);
+
+    print(vect1);
+    print(vect2);
+    print(vect12);
+
+    ent_delete(V11); ent_delete(V12); ent_delete(V21); ent_delete(V22);
+    ent_delete(W11); ent_delete(W12); ent_delete(W21); ent_delete(W22);
+    ent_delete(X11); ent_delete(X12); ent_delete(X21); ent_delete(X22);
+    delete(V1); delete(V2); delete(W1); delete(W2); delete(X1); delete(X2);
+    top_ent_delete(vect1); top_ent_delete(vect2); top_ent_delete(vect12);
     return 0;
 }
 #endif

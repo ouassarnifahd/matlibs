@@ -15,7 +15,7 @@ debugPath	:= debug
 Project		:= matlib
 
 #Debug
-dbgFlags	:= $(wFlag) -D DEBUG
+dbgFlags	:= $(wFlag) -g -D DEBUG
 
 #Colors
 RED			:= \033[0;31m
