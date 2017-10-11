@@ -1,16 +1,19 @@
 # Simple math implementation with C
 
-## I. Real Numbers (v0.0.2)
+## I. Numbers (v0.0.1)
 
-* Polynomes
-* Vectors
+* #### Real
+* #### Complexe
 
-## II. Complexe Numbers (v0.0.1)
+## II. Vectors (v0.0.2)
 
-* Polynomes
-* Vectors
+* #### entity — description of any math structure
 
-## III. Matrix (v0.0.5)
+## III. Polynomes (v0.0.3)
 
+## VI. Matrix (v0.0.5)
+
+
+##### What's new!
 * Making use of void* to adapt with all the structures.
 * Introducing math entities
