@@ -32,7 +32,10 @@ void* real_new(double x) {
 }
 
 void real_delete(void* x) {
-    if (x) free(x);
+    if (x) {
+        free(x);
+        x = NULL;
+    }
 }
 
 void real_zero(void* x) {

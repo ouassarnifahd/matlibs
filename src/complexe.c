@@ -10,7 +10,7 @@
 // };
 
 void* complexe_new(double real, double imaginary) {
-    complexe_t new = malloc(sizeof(complexe_t));
+    complexe_t new = malloc(sizeof(union complexe));
     new->alg.ztab[0] = real_new(real);
     new->alg.ztab[1] = real_new(imaginary);
     return (void*)new;
@@ -18,9 +18,11 @@ void* complexe_new(double real, double imaginary) {
 
 void complexe_delete(void* z) {
     if (z) {
-        real_t *del = (real_t *)z;
-        real_delete(del[0]);
-        real_delete(del[1]);
+        complexe_t del = (complexe_t)z;
+        real_delete(del->alg.ztab[0]);
+        real_delete(del->alg.ztab[1]);
+        free(del);
+        del = NULL;
     }
 }
 
@@ -128,7 +130,7 @@ void complexe_pow(const void* z, size_t pow, void* res) {
 void complexe_print(const void* x) {
     complexe_t z = (const complexe_t)x;
     if (complexe_is_null(z)) {
-        printf("0");
+        printf("0.00 ");
     } else {
         if (complexe_is_real(z)) {
             real_print(z->alg.zReIm.real);

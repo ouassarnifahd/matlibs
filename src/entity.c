@@ -12,5 +12,32 @@ math_entity_t entity_new(size_t size_element, math_new_t new, math_methode_t del
 }
 
 void entity_delete(math_entity_t ent) {
-    if (ent) free(ent);
+    if (ent) {
+        free(ent);
+        ent = NULL;
+    }
+}
+
+void* math_new(void) {
+    return NULL;
+}
+
+bool math_test(const void *x) {
+    return true;
+}
+
+void math_methode(void *x) {
+    if (x) x = NULL;
+}
+
+void math_operation(const void *x1, const void *x2, void *res) {
+    res = NULL;
+}
+
+void math_pow(const void *x, size_t pow, void *res) {
+    res = NULL;
+}
+
+void math_print(const void *x) {
+    printf("D-entity");
 }
