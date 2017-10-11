@@ -1,17 +1,18 @@
-# Simple math implementation with C
+# Simple math implementations with C
 
-## I. Numbers (v0.0.1)
+## I. Numbers (v0.0.1 - stable)
+* Real
+* Complexe
 
-* #### Real
-* #### Complexe
+## II. Vectors (v0.0.2 - unstable)
+* entity — description of math structures so we can create
+  * Polynomes (i.e. vectors)
+  * Matrix (i.e vectors columns & lines)
+  * Fractions (i.e 2 vectors)
 
-## II. Vectors (v0.0.2)
-
-* #### entity — description of any math structure
-
-## III. Polynomes (v0.0.3)
-
-## VI. Matrix (v0.0.5)
+## III.Functions (work in progress)
+* differentials
+* Newton search algorithm
 
 
 ##### What's new!
