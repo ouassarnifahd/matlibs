@@ -172,28 +172,6 @@ void vect_print_ligne(const void* x) {
 #include "complexe.h"
 #include "real.h"
 
-const struct math complexe_entity = {
-    SIZE_COMPLEXE,
-    (math_new_t)complexe_new,
-    complexe_delete, complexe_zero, complexe_one, complexe_inv,
-    complexe_is_null, math_test, math_test,
-    complexe_add, complexe_sub, complexe_mult, complexe_div,
-    complexe_print
-};
-
-typedef void* (*math_complexe_new_t) (double, double);
-
-const struct math real_entity = {
-    SIZE_REAL,
-    (math_new_t)real_new,
-    real_delete, real_zero, real_one, real_inv,
-    real_is_null, real_is_positive, real_is_negative,
-    real_add, real_sub, real_mult, real_div,
-    real_print
-};
-
-typedef void* (*math_real_new_t) (double);
-
 const struct math vect_entity = {
     SIZE_VECT,
     (math_new_t)vect_new,

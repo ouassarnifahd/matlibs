@@ -1,13 +1,15 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <stdarg.h>  // args ...
-#include <stdbool.h> // bool
-#include <stdlib.h>  // malloc
-#include <stdio.h>   // print
-#include <string.h>  // Temporary (memcpy)
+#include <stdarg.h>  // args (...)
+#include <stdbool.h> // bool defs
+#include <stdlib.h>  // malloc & free
+#include <stdio.h>   // printf
+#include <string.h>  // memcpy & strcat
 
-#define PI 3.1415926536
+#include "error.h"   // handling errors/warnings/debug
+
+#define Mat_PI 3.1415926536
 
 #define Mat_size(data) printf("%lu Octet\n", sizeof(data))
 #define Mat_max(x,y) x >= y ? x : y
