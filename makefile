@@ -43,9 +43,9 @@ $(debugPath)/%.dbg: $(srcPath)/%.c $(inc)
 	@$(MAKE) directory path=$(dir $@)
 	@if [ '$(objects)' != '' ]; then \
 		$(MAKE) $(addprefix $(debugPath)/,$(objects)) Flags="$(Flags)"; \
-		$(MAKE) compile OBJ=no CFlags="$(dbgFlags) $(Flags)" out=$@ objects="$(addprefix $(debugPath)/,$(objects)) $<" 2> $(basename $@).err; \
+		$(MAKE) compile OBJ='no' CFlags="$(dbgFlags) $(Flags)" out=$@ objects="$(addprefix $(debugPath)/,$(objects)) $<" 2> $(basename $@).err; \
 	else \
-		$(MAKE) compile OBJ=no CFlags="$(dbgFlags) $(Flags)" out=$@ objects=$< 2> $(basename $@).err; \
+		$(MAKE) compile OBJ='no' CFlags="$(dbgFlags) $(Flags)" out=$@ objects=$< 2> $(basename $@).err; \
 	fi;
 
 $(debugPath)/%.o: $(srcPath)/%.c
@@ -68,7 +68,7 @@ directory:
 	@[ -d $(path) ] || $(MKDIR) $(path)
 
 compile:
-	@if [ $(OBJ) == yes ]; then $(CC) -I $(incPath) $(CFlags) -c -o $(out) $(in); else $(CC) -I $(incPath) $(CFlags) -o $(out) $(objects); fi
+	@if [ $(OBJ) == 'yes' ]; then $(CC) -I $(incPath) $(CFlags) -c -o $(out) $(in); else $(CC) -I $(incPath) $(CFlags) -o $(out) $(objects); fi
 
 mrproper:
 	@[ ! -d $(binPath)   ] || $(RM) $(binPath)/*
