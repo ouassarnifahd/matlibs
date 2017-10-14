@@ -16,17 +16,9 @@ double Mat_root(double x, size_t n) {
     return 0.0;
 }
 
-// const struct math real_entity = {
-//     SIZE_REAL,
-//     (math_new_t)real_new,
-//     real_delete, real_zero, real_one, real_inv,
-//     real_is_null, real_is_positive, real_is_negative,
-//     real_add, real_sub, real_mult, real_div,
-//     real_print
-// };
-
 void* real_new(double x) {
     real_t new = malloc(sizeof(double));
+    alloc_check(new);
     *new = x;
     return (void*)new;
 }
@@ -87,6 +79,7 @@ void real_div(const void* x1, const void* x2, void* res) {
     if (real_is_null((const real_t)x2)) {
         real_delete((real_t)res);
         res = NULL;
+        error("Division by zero!");
     } else {
         double a = *(const real_t)x1, b = *(const real_t)x2;
         *(real_t)res = a / b;

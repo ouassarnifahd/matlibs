@@ -8,10 +8,6 @@
 
 typedef vector_t polynome_t;
 
-#define polynome_zero(deg) vect_zero(deg + 1)
-
-#define polynome_one(deg) vect_one(deg + 1)
-
 #define polynome_new(deg, ent, ...) vect_new(deg + 1, ent, ##__VA_ARGS__)
 
 #define polynome_delete(p) vect_delete(p)

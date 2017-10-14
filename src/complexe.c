@@ -1,16 +1,8 @@
 #include "complexe.h"
 
-// const struct math complexe_entity = {
-//     SIZE_COMPLEXE,
-//     (math_new_t)complexe_new,
-//     complexe_delete, complexe_zero, complexe_one, complexe_inv,
-//     complexe_is_null, NULL, NULL,
-//     complexe_add, complexe_sub, complexe_mult, complexe_div,
-//     complexe_print
-// };
-
 void* complexe_new(double real, double imaginary) {
     complexe_t new = malloc(sizeof(union complexe));
+    alloc_check(new);
     new->alg.ztab[0] = real_new(real);
     new->alg.ztab[1] = real_new(imaginary);
     return (void*)new;
@@ -73,21 +65,21 @@ void complexe_add(const void* z1, const void* z2, void* res) {
 
 void complexe_sub(const void* z1, const void* z2, void* res) {
     union complexe a = *(const complexe_t)z1, b = *(const complexe_t)z2, tmp_res = *(complexe_t)res;
-    real_sub((const void*)a.alg.ztab[0], (const void*)b.alg.ztab[0], (void*)tmp_res.alg.ztab[0]);
-    real_sub((const void*)a.alg.ztab[1], (const void*)b.alg.ztab[1], (void*)tmp_res.alg.ztab[1]);
+    real_sub(a.alg.ztab[0], b.alg.ztab[0], tmp_res.alg.ztab[0]);
+    real_sub(a.alg.ztab[1], b.alg.ztab[1], tmp_res.alg.ztab[1]);
 }
 
 void complexe_mult(const void* z1, const void* z2, void* res) { // z1 * z2 = (a1 * a2 - b1 * b2) + i * (a1 * b2 + a2 * b1)
     union complexe a = *(const complexe_t)z1, b = *(const complexe_t)z2, tmp_res = *(complexe_t)res;
     complexe_t tmp = complexe_new(0, 0);
     // a1 * a2 - b1 * b2
-    real_mult((const void*)a.alg.ztab[0], (const void*)b.alg.ztab[0], (void*)tmp->alg.ztab[0]);
-    real_mult((const void*)a.alg.ztab[1], (const void*)b.alg.ztab[1], (void*)tmp->alg.ztab[1]);
-    real_sub((const void*)tmp->alg.ztab[0], (const void*)tmp->alg.ztab[1], (void*)tmp_res.alg.ztab[0]);
+    real_mult(a.alg.ztab[0], b.alg.ztab[0], tmp->alg.ztab[0]);
+    real_mult(a.alg.ztab[1], b.alg.ztab[1], tmp->alg.ztab[1]);
+    real_sub(tmp->alg.ztab[0], tmp->alg.ztab[1], tmp_res.alg.ztab[0]);
     // a1 * b2 + a2 * b1
-    real_mult((const void*)a.alg.ztab[0], (const void*)b.alg.ztab[1], (void*)tmp->alg.ztab[0]);
-    real_mult((const void*)a.alg.ztab[1], (const void*)b.alg.ztab[0], (void*)tmp->alg.ztab[1]);
-    real_add((const void*)tmp->alg.ztab[0], (const void*)tmp->alg.ztab[1], (void*)tmp_res.alg.ztab[1]);
+    real_mult(a.alg.ztab[0], b.alg.ztab[1], tmp->alg.ztab[0]);
+    real_mult(a.alg.ztab[1], b.alg.ztab[0], tmp->alg.ztab[1]);
+    real_add(tmp->alg.ztab[0], tmp->alg.ztab[1], tmp_res.alg.ztab[1]);
     complexe_delete(tmp);
 }
 
@@ -95,24 +87,25 @@ void complexe_div(const void* z1, const void* z2, void* res) { // z1 / z2 = ((a1
     if (complexe_is_null((const complexe_t)z2)) {
         complexe_delete((complexe_t)res);
         res = NULL;
+        error("Division by zero!");
     } else {
         union complexe a = *(const complexe_t)z1, b = *(const complexe_t)z2, tmp_res = *(complexe_t)res;
         complexe_t tmp1 = complexe_new(0, 0), tmp2 = complexe_new(0, 0);
         real_t den = real_new(0);
-        real_mult((const void*)a.alg.ztab[0], (const void*)b.alg.ztab[0], (void*)tmp1->alg.ztab[0]);
-        real_mult((const void*)a.alg.ztab[1], (const void*)b.alg.ztab[1], (void*)tmp1->alg.ztab[1]);
-        real_add((const void*)tmp1->alg.ztab[0], (const void*)tmp1->alg.ztab[1], (void*)tmp2->alg.ztab[0]);
+        real_mult(a.alg.ztab[0], b.alg.ztab[0], tmp1->alg.ztab[0]);
+        real_mult(a.alg.ztab[1], b.alg.ztab[1], tmp1->alg.ztab[1]);
+        real_add(tmp1->alg.ztab[0], tmp1->alg.ztab[1], tmp2->alg.ztab[0]);
 
-        real_mult((const void*)a.alg.ztab[1], (const void*)b.alg.ztab[0], (void*)tmp1->alg.ztab[0]);
-        real_mult((const void*)a.alg.ztab[0], (const void*)b.alg.ztab[1], (void*)tmp1->alg.ztab[1]);
-        real_sub((const void*)tmp1->alg.ztab[0], (const void*)tmp1->alg.ztab[1], (void*)tmp2->alg.ztab[1]);
+        real_mult(a.alg.ztab[1], b.alg.ztab[0], tmp1->alg.ztab[0]);
+        real_mult(a.alg.ztab[0], b.alg.ztab[1], tmp1->alg.ztab[1]);
+        real_sub(tmp1->alg.ztab[0], tmp1->alg.ztab[1], tmp2->alg.ztab[1]);
 
-        real_mult((const void*)b.alg.ztab[0], (const void*)b.alg.ztab[0], (void*)tmp1->alg.ztab[0]);
-        real_mult((const void*)b.alg.ztab[1], (const void*)b.alg.ztab[1], (void*)tmp1->alg.ztab[1]);
-        real_add((const void*)tmp1->alg.ztab[0], (const void*)tmp1->alg.ztab[1], (void*)den);
+        real_mult(b.alg.ztab[0], b.alg.ztab[0], tmp1->alg.ztab[0]);
+        real_mult(b.alg.ztab[1], b.alg.ztab[1], tmp1->alg.ztab[1]);
+        real_add(tmp1->alg.ztab[0], tmp1->alg.ztab[1], den);
 
-        real_div((const void*)tmp2->alg.ztab[0], (const void*)den, (void*)tmp_res.alg.ztab[0]);
-        real_div((const void*)tmp2->alg.ztab[1], (const void*)den, (void*)tmp_res.alg.ztab[1]);
+        real_div(tmp2->alg.ztab[0], den, tmp_res.alg.ztab[0]);
+        real_div(tmp2->alg.ztab[1], den, tmp_res.alg.ztab[1]);
 
         complexe_delete(tmp1);
         complexe_delete(tmp2);

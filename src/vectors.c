@@ -3,10 +3,12 @@
 void* vect_new(size_t size, math_entity_t ent, ...) {
     va_list args;
     vector_t vect = malloc(sizeof(struct vect));
+    alloc_check(vect);
     void* arg = NULL;
     vect->ent = ent;
     vect->size = size;
     vect->vector = malloc(size * ent->size_element);
+    alloc_check(vect->vector);
     va_start(args, ent);
     for (size_t i = 0; i < size; i++) {
         arg = va_arg(args, void*);
@@ -53,6 +55,7 @@ void vect_inv(void* x) {
 void vect_add(const void* x1, const void* x2, void* res) {
     vector_t vect1 = (const vector_t)x1, vect2 = (const vector_t)x2, vect = (vector_t)res;
     if (vect1->ent->size_element != vect2->ent->size_element) {
+        error("Incompatible operation");
         vect = NULL;
     } else {
         size_t max_vects = Mat_max(vect1->size, vect2->size);
@@ -70,6 +73,7 @@ void vect_add(const void* x1, const void* x2, void* res) {
 void vect_sub(const void* x1, const void* x2, void* res) {
     vector_t vect1 = (const vector_t)x1, vect2 = (const vector_t)x2, vect = (vector_t)res;
     if (vect1->ent->size_element != vect2->ent->size_element) {
+        error("Incompatible operation");
         vect = NULL;
     } else {
         size_t max_vects = Mat_max(vect1->size, vect2->size);
@@ -96,6 +100,7 @@ void vect_mult(const void* x1, const void* x2, void* res) {
 void vect_mult_vect(const void* x1, const void* x2, void* res) {
     vector_t vect1 = (const vector_t)x1, vect2 = (const vector_t)x2, vect = (vector_t)res;
     if (vect1->ent->size_element != vect2->ent->size_element) {
+        error("Incompatible operation");
         vect = NULL;
     } else {
         size_t min_vects = Mat_min(vect1->size, vect2->size);
@@ -109,6 +114,7 @@ void vect_dot(const void* x1, const void* x2 , void* res) {
     vector_t vect1 = (const vector_t)x1, vect2 = (const vector_t)x2;
     void* dot_mult = malloc(vect1->ent->size_element);
     if (vect1->ent->size_element != vect2->ent->size_element) {
+        error("Incompatible operation");
         res = NULL;
     } else {
         size_t min_vects = Mat_min(vect1->size, vect2->size);
@@ -125,6 +131,7 @@ void vect_cauchy_mult(const void* x1, const void* x2, void* res) {
     vector_t vect1 = (const vector_t)x1, vect2 = (const vector_t)x2, vect = (vector_t)res;
     void* tmp = malloc(vect1->ent->size_element);
     if (vect1->ent->size_element != vect2->ent->size_element) {
+        error("Incompatible operation");
         vect = NULL;
     } else {
         for (size_t i = 0; i < vect1->size + vect2->size - 1; i++) {
@@ -189,7 +196,7 @@ int main(int argc, char const *argv[]) {
     math_real_new_t ent_new = entity->new;
     math_methode_t top_ent_delete = top_entity->delete, ent_delete = entity->delete;
     math_methode_t delete = vect_delete;
-    math_operation_t opertation = vect_add;
+    math_operation_t operation = vect_add;
     math_print_t print = vect_print;
 
     void* vect1 = new(3, top_entity,
@@ -207,7 +214,7 @@ int main(int argc, char const *argv[]) {
           top_ent_new(3, entity, ent_new(0), ent_new(0), ent_new(0)),
           top_ent_new(3, entity, ent_new(0), ent_new(0), ent_new(0)));
 
-    opertation(vect1, vect2, vect12);
+    operation(vect1, vect2, vect12);
 
     print(vect1);
     print(vect2);
