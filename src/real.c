@@ -31,18 +31,28 @@ void real_delete(void* x) {
 }
 
 void real_zero(void* x) {
-    real_t tmp = (real_t)x;
-    *tmp = 0;
+    if (!x) {
+        x = malloc(SIZE_REAL);
+        alloc_check(x);
+    }
+    *(real_t)x = 0;
 }
 
 void real_one(void* x) {
-    real_t tmp = (real_t)x;
-    *tmp = 1;
+    if (!x)
+        x = malloc(SIZE_REAL);
+        alloc_check(x);
+    }
+    *(real_t)x = 1;
 }
 
 void real_inv(void* x) {
-    real_t tmp = (real_t)x;
-    *tmp = -*tmp;
+    if (x) {
+        real_t tmp = (real_t)x;
+        *tmp = -*tmp;
+    } else {
+        error("NULL pointer can't be inversed!");
+    }
 }
 
 bool real_is_null(const void* x) {
@@ -95,10 +105,10 @@ void real_print(const void* x) {
 int main(int argc, char const *argv[]) {
     real_t x1 = real_new(1.2), x2 = real_new(2.8);
     real_t add = real_new(0), sub = real_new(0), mult = real_new(0), division = real_new(0);
-    real_add((const void*)x1, (const void*)x2, (void*)add);
-    real_sub((const void*)x1, (const void*)x2, (void*)sub);
-    real_mult((const void*)x1, (const void*)x2, (void*)mult);
-    real_div((const void*)x1, (const void*)x2, (void*)division);
+    real_add(x1, x2, add);
+    real_sub(x1, x2, sub);
+    real_mult(x1, x2, mult);
+    real_div(x1, x2, division);
     real_print(x1); printf(" + "); real_print(x2); printf(" = "); real_print(add); printf("\n");
     real_print(x1); printf(" - "); real_print(x2); printf(" = "); real_print(sub); printf("\n");
     real_print(x1); printf(" * "); real_print(x2); printf(" = "); real_print(mult); printf("\n");

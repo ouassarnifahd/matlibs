@@ -37,7 +37,7 @@ help:
 	@echo "the project is in developement"
 	@echo "make ./$(debugPath)/srcfile.dbg objects=\"object.o files.o dependencies.o if_there_is_any.o\""
 	@echo "NB: srcfile.c should have a main function in the DEBUG macro space"
-	@echo "ie: ./$(debugPath)/polynome.dbg objects=\"complexe.o vectors.o\""
+	@echo "ie: ./$(debugPath)/vectors.dbg objects=\"real.o complexe.o entity.o\""
 
 $(debugPath)/%.dbg: $(srcPath)/%.c $(inc)
 	@$(MAKE) directory path=$(dir $@)
@@ -68,7 +68,11 @@ directory:
 	@[ -d $(path) ] || $(MKDIR) $(path)
 
 compile:
-	@if [ $(OBJ) == 'yes' ]; then $(CC) -I $(incPath) $(CFlags) -c -o $(out) $(in); else $(CC) -I $(incPath) $(CFlags) -o $(out) $(objects); fi
+	@if [ $(OBJ) = 'yes' ]; then \
+		$(CC) -I $(incPath) $(CFlags) -c -o $(out) $(in); \
+	else \
+		$(CC) -I $(incPath) $(CFlags) -o $(out) $(objects); \
+	fi
 
 mrproper:
 	@[ ! -d $(binPath)   ] || $(RM) $(binPath)/*

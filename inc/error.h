@@ -1,12 +1,16 @@
 #ifndef ERROR_H
 #define ERROR_H
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 128
 
+#ifdef DEBUG
 #define LOGFILE_PATH "debug/logfile.mlb"
+#else
+#define LOGFILE_PATH "./logfile.mlb"
+#endif
 
-char out_buf[128];
-char out_str[128];
+char out_buf[BUFFER_SIZE];
+char out_str[BUFFER_SIZE];
 
 static FILE* logfile = NULL;
 
