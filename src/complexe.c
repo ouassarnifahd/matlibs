@@ -19,48 +19,79 @@ void complexe_delete(void* z) {
 }
 
 bool complexe_is_null(const void* x) {
-    complexe_t z = (const complexe_t)x;
-    return !*z->alg.ztab[0]&& !*z->alg.ztab[1];
+    if (x) {
+        complexe_t z = (const complexe_t)x;
+        return !*z->alg.ztab[0]&& !*z->alg.ztab[1];
+    } else {
+        warning("NULL pointer is already null!");
+        return 1;
+    }
+
 }
 
 bool complexe_is_real(const void* x) {
-    complexe_t z = (const complexe_t)x;
-    return *z->alg.ztab[0] && !*z->alg.ztab[1];
+    if (x) {
+        complexe_t z = (const complexe_t)x;
+        return *z->alg.ztab[0] && !*z->alg.ztab[1];
+    } else {
+        error("NULL pointer can't be real!");
+    }
 }
 
 bool complexe_is_imaginary(const void* x) {
-    complexe_t z = (const complexe_t)x;
-    return !*z->alg.ztab[0] && *z->alg.ztab[1];
+    if (x) {
+        complexe_t z = (const complexe_t)x;
+        return !*z->alg.ztab[0] && *z->alg.ztab[1];
+    } else {
+        error("NULL pointer can't be imaginary!");
+    }
 }
 
 void complexe_zero(void* z) {
+    if (!z) {
+        z = malloc(SIZE_COMPLEXE);
+        alloc_check(z);
+    }
     complexe_t z_tmp = z;
     *z_tmp->alg.ztab[0] = 0;
     *z_tmp->alg.ztab[1] = 0;
 }
 
 void complexe_one(void* z) {
+    if (!z) {
+        z = malloc(SIZE_COMPLEXE);
+        alloc_check(z);
+    }
     complexe_t z_tmp = z;
     *z_tmp->alg.ztab[0] = 1;
     *z_tmp->alg.ztab[1] = 0;
 }
 
 void complexe_i(void* z) {
+    if (!z) {
+        z = malloc(SIZE_COMPLEXE);
+        alloc_check(z);
+    }
     complexe_t z_tmp = z;
     *z_tmp->alg.ztab[0] = 0;
     *z_tmp->alg.ztab[1] = 1;
 }
 
 void complexe_inv(void* z) {
-    complexe_t z_tmp = (const complexe_t)z;
-    *z_tmp->alg.ztab[0] = -*z_tmp->alg.ztab[0];
-    *z_tmp->alg.ztab[1] = -*z_tmp->alg.ztab[1];
+    if (z) {
+        complexe_t z_tmp = z;
+        *z_tmp->alg.ztab[0] = -*z_tmp->alg.ztab[0];
+        *z_tmp->alg.ztab[1] = -*z_tmp->alg.ztab[1];
+    } else {
+        error("NULL pointer can't be inversed!");
+    }
+
 }
 
 void complexe_add(const void* z1, const void* z2, void* res) {
     union complexe a = *(const complexe_t)z1, b = *(const complexe_t)z2, tmp_res = *(complexe_t)res;
-    real_add((const void*)a.alg.ztab[0], (const void*)b.alg.ztab[0], (void*)tmp_res.alg.ztab[0]);
-    real_add((const void*)a.alg.ztab[1], (const void*)b.alg.ztab[1], (void*)tmp_res.alg.ztab[1]);
+    real_add(a.alg.ztab[0], b.alg.ztab[0], tmp_res.alg.ztab[0]);
+    real_add(a.alg.ztab[1], b.alg.ztab[1], tmp_res.alg.ztab[1]);
 }
 
 void complexe_sub(const void* z1, const void* z2, void* res) {
