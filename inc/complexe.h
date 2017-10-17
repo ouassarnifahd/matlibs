@@ -50,15 +50,4 @@ void complexe_pow(const void* z, size_t pow, void* res);
 
 void complexe_print(const void* z);
 
-static const struct math complexe_entity = {
-    SIZE_COMPLEXE,
-    (math_new_t)complexe_new,
-    complexe_delete, complexe_zero, complexe_one, complexe_inv,
-    complexe_is_null, math_test, math_test,
-    complexe_add, complexe_sub, complexe_mult, complexe_div,
-    complexe_print
-};
-
-typedef void* (*math_complexe_new_t) (double, double);
-
 #endif /* end of include guard: COMPLEXE_H */

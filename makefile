@@ -16,6 +16,11 @@ Project		:= matlib
 
 #Debug
 dbgFlags	:= $(wFlag) -g -D DEBUG
+dbgFlags	+= -D DEBUG_CONTEXT
+dbgFlags	+= -D DEBUG_MALLOC
+dbgFlags	+= -D DEBUG_FREE
+dbgFlags	+= -D DEBUG_INIT
+dbgFlags	+= -D DEBUG_OPERATION
 
 #Colors
 RED			:= \033[0;31m
@@ -37,7 +42,7 @@ help:
 	@echo "the project is in developement"
 	@echo "make ./$(debugPath)/srcfile.dbg objects=\"object.o files.o dependencies.o if_there_is_any.o\""
 	@echo "NB: srcfile.c should have a main function in the DEBUG macro space"
-	@echo "ie: ./$(debugPath)/polynome.dbg objects=\"complexe.o vectors.o\""
+	@echo "ie: ./$(debugPath)/vectors.dbg objects=\"real.o complexe.o entity.o\""
 
 $(debugPath)/%.dbg: $(srcPath)/%.c $(inc)
 	@$(MAKE) directory path=$(dir $@)
@@ -50,25 +55,29 @@ $(debugPath)/%.dbg: $(srcPath)/%.c $(inc)
 
 $(debugPath)/%.o: $(srcPath)/%.c
 	@$(MAKE) directory path=$(dir $@)
-	@$(MAKE) compile OBJ='yes' CFlags="$(Flags)" out=$@ in=$<
+	@$(MAKE) compile OBJ='yes' CFlags="$(dbgFlags) $(Flags)" out=$@ in=$<
 
 $(objPath)/%.o: $(srcPath)/%.c
 	@$(MAKE) directory path=$(dir $@)
-	@$(MAKE) compile OBJ='yes' CFlags="$(Flags)" out=$@ in=$<
+	@$(MAKE) compile OBJ='yes' CFlags="$(dbgFlags) $(Flags)" out=$@ in=$<
 
 $(objPath)/$(type)/$(Project).o: $(srcPath)/main.c
 	@$(MAKE) directory path=$(dir $@)
-	@$(MAKE) compile OBJ='yes' CFlags="$(Flags)" out=$@ in=$<
+	@$(MAKE) compile OBJ='yes' CFlags="$(dbgFlags) $(Flags)" out=$@ in=$<
 
 $(objPath)/%.o: $(srcPath)/%.c
 	@$(MAKE) directory path=$(dir $@)
-	@$(MAKE) compile OBJ='yes' CFlags="$(Flags)" out=$@ in=$<
+	@$(MAKE) compile OBJ='yes' CFlags="$(dbgFlags) $(Flags)" out=$@ in=$<
 
 directory:
 	@[ -d $(path) ] || $(MKDIR) $(path)
 
 compile:
-	@if [ $(OBJ) == 'yes' ]; then $(CC) -I $(incPath) $(CFlags) -c -o $(out) $(in); else $(CC) -I $(incPath) $(CFlags) -o $(out) $(objects); fi
+	@if [ $(OBJ) = 'yes' ]; then \
+		$(CC) -I $(incPath) $(CFlags) -c -o $(out) $(in); \
+	else \
+		$(CC) -I $(incPath) $(CFlags) -o $(out) $(objects); \
+	fi
 
 mrproper:
 	@[ ! -d $(binPath)   ] || $(RM) $(binPath)/*
