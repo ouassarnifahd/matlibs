@@ -16,6 +16,11 @@ Project		:= matlib
 
 #Debug
 dbgFlags	:= $(wFlag) -g -D DEBUG
+dbgFlags	+= -D DEBUG_CONTEXT
+dbgFlags	+= -D DEBUG_MALLOC
+dbgFlags	+= -D DEBUG_FREE
+dbgFlags	+= -D DEBUG_INIT
+dbgFlags	+= -D DEBUG_OPERATION
 
 #Colors
 RED			:= \033[0;31m
@@ -50,19 +55,19 @@ $(debugPath)/%.dbg: $(srcPath)/%.c $(inc)
 
 $(debugPath)/%.o: $(srcPath)/%.c
 	@$(MAKE) directory path=$(dir $@)
-	@$(MAKE) compile OBJ='yes' CFlags="$(Flags)" out=$@ in=$<
+	@$(MAKE) compile OBJ='yes' CFlags="$(dbgFlags) $(Flags)" out=$@ in=$<
 
 $(objPath)/%.o: $(srcPath)/%.c
 	@$(MAKE) directory path=$(dir $@)
-	@$(MAKE) compile OBJ='yes' CFlags="$(Flags)" out=$@ in=$<
+	@$(MAKE) compile OBJ='yes' CFlags="$(dbgFlags) $(Flags)" out=$@ in=$<
 
 $(objPath)/$(type)/$(Project).o: $(srcPath)/main.c
 	@$(MAKE) directory path=$(dir $@)
-	@$(MAKE) compile OBJ='yes' CFlags="$(Flags)" out=$@ in=$<
+	@$(MAKE) compile OBJ='yes' CFlags="$(dbgFlags) $(Flags)" out=$@ in=$<
 
 $(objPath)/%.o: $(srcPath)/%.c
 	@$(MAKE) directory path=$(dir $@)
-	@$(MAKE) compile OBJ='yes' CFlags="$(Flags)" out=$@ in=$<
+	@$(MAKE) compile OBJ='yes' CFlags="$(dbgFlags) $(Flags)" out=$@ in=$<
 
 directory:
 	@[ -d $(path) ] || $(MKDIR) $(path)
