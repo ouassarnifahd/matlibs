@@ -1,7 +1,7 @@
 #ifndef MFILES_H
 #define MFILES_H
 
-// #include "liste.h"
+#include "liste.h"
 
 #define MAX_PATH_SIZE 512
 
@@ -20,7 +20,10 @@ typedef struct Mat_file {
     FILE* fptr;
 }* file_t;
 
-static file_t files_Opened[MAX_FILES];
+static TList files_Opened = {
+    MAX_FILES, sizeof(file_t),
+    NULL, NULL, NULL, -1
+};
 
 file_t file_import(char* path);
 

@@ -1,4 +1,4 @@
-#include "real.h"
+#include "structures/real.h"
 
 double Mat_pow(double x, size_t n) {
     double power = 1;
@@ -275,7 +275,13 @@ void real_print(const void* x) {
 
 #ifdef DEBUGED
 int main(int argc, char const *argv[]) {
-    arch_test();
+    #if defined (__x86_64__)
+        debug("64-bit architecture!\n");
+    #elif defined (__i386__)
+        warning("32-bit architecture!\n");
+    #else
+        error("Incompatible architecture!");
+    #endif
     real_t x1 = real_new(1.2), x2 = real_new(2.8);
     real_t add = real_new(0), sub = real_new(0), mult = real_new(0), division = real_new(0);
     real_add(x1, x2, add);
@@ -292,6 +298,7 @@ int main(int argc, char const *argv[]) {
     real_delete(division);
     real_delete(x1);
     real_delete(x2);
+    debug("FY!");
     return 0;
 }
 #endif

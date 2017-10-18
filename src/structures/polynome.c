@@ -1,4 +1,4 @@
-#include "polynome.h"
+#include "structures/polynome.h"
 
 // polynome_t polynome_pow(polynome_t p, size_t n) {
 //     polynome_t power = polynome_zero((p.size - 1) * n);

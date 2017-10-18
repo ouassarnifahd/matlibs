@@ -1,4 +1,4 @@
-#include "vectors.h"
+#include "structures/vectors.h"
 
 static void* vect_init(size_t size, math_entity_t ent) {
     #ifdef DEBUG_CONTEXT
@@ -357,7 +357,7 @@ void vect_print_ligne(const void* x) {
 }
 
 #ifdef DEBUG
-#include "alglib.h"
+#include "structures/alglib.h"
 
 int main(int argc, char const *argv[]) {
     #if defined (__x86_64__)
