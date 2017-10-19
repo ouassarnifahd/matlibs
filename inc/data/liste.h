@@ -59,7 +59,7 @@ typedef PTList PTPile;
 
 #define TPile_PUSH(pile, pNewElt) TList_Add(pile, pNewElt)
 
-PTNode TPile_POP(const PTPile pile, deleteElem);
+PTNode TPile_POP(const PTPile pile, deleteElem_t deleteElem);
 
 #define TPile_Delete(pile, deleteElem) TList_Delete(pile, deleteElem)
 

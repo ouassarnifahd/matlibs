@@ -117,8 +117,7 @@ static size_t getLastSignificantByte(sizem_t usize) {
         printf("%hhx, %hhx, ", usize.mem[i], usize.mem[i + 1]);
     }
     printf("\n");
-    // if (size % 2) size++;
-    return size;
+    return (size < 8)? ((size < 4)? 4: 8): 8;
 }
 
 void file_export(file_t mfile) {
