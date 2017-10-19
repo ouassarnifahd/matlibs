@@ -1,6 +1,6 @@
 #include "structures/vectors.h"
 
-static void* vect_init(size_t size, math_entity_t ent) {
+void* vect_init(size_t size, math_entity_t ent) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
@@ -357,7 +357,7 @@ void vect_print_ligne(const void* x) {
 }
 
 #ifdef DEBUG
-#include "structures/alglib.h"
+#include "alglib.h"
 
 int main(int argc, char const *argv[]) {
     #if defined (__x86_64__)
@@ -369,25 +369,25 @@ int main(int argc, char const *argv[]) {
     #endif
     math_entity_t entity = &real_entity;
     math_vect_new_t new = vect_new;
+    math_methode_t delete = vect_delete;
     math_real_new_t ent_new = entity->new;
     math_methode_t ent_delete = entity->delete;
-    math_methode_t delete = vect_delete;
-    math_operation_t operation = vect_add;
-    math_print_t print = vect_print_colonne;
+    math_operation_t operation = vect_mult;
+    math_print_t print = vect_print_ligne;
 
-    void* vect1 = new(6, entity, ent_new(100),
+    void* vect1 = new(6, entity, ent_new(1),
                                  ent_new(2),
                                  ent_new(3),
                                  ent_new(4),
                                  ent_new(5),
                                  ent_new(6));
 
-    void* vect2 = new(6, entity, ent_new(1),
-                                 ent_new(2),
-                                 ent_new(3),
-                                 ent_new(4),
+    void* vect2 = new(6, entity, ent_new(6),
                                  ent_new(5),
-                                 ent_new(6));
+                                 ent_new(4),
+                                 ent_new(3),
+                                 ent_new(2),
+                                 ent_new(1));
 
     void* vect12 = vect_init(6, entity);
 
@@ -397,13 +397,14 @@ int main(int argc, char const *argv[]) {
 
     operation(vect1, vect2, vect12);
 
-    printf("dot = "); entity->print(dot); printf("\n");
-
     print(vect1);
     print(vect2);
+
+    printf("dot = "); entity->print(dot); printf("\n");
+
     print(vect12);
 
-    free(dot);
+    ent_delete(dot);
     delete(vect1);
     delete(vect2);
     delete(vect12);

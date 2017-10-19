@@ -8,9 +8,11 @@ typedef struct vect {
     size_t size;
     math_entity_t ent;
     void* vector;
-}* vector_t;
+} *vector_t;
 
 #define SIZE_VECT sizeof(struct vect)
+
+void* vect_init(size_t size, math_entity_t ent);
 
 void* vect_new(size_t size, math_entity_t ent, ...);
 

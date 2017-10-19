@@ -20,10 +20,10 @@ void* real_new(double x) {
     debug("Entering function!");
     #endif
     real_t new = malloc(SIZE_REAL);
-    #ifdef DEBUG_MALLOC
-    if (new) debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
-    #endif
     alloc_check(new);
+    #ifdef DEBUG_MALLOC
+    debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
+    #endif
     #ifdef DEBUG_INIT
     debug("Initialising 'real_t' <- "PRINT_REAL, x);
     #endif
@@ -123,10 +123,10 @@ void real_one(void* x) {
     #endif
     if (!x) {
         x = malloc(SIZE_REAL);
-        #ifdef DEBUG_MALLOC
-        if (x) debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
-        #endif
         alloc_check(x);
+        #ifdef DEBUG_MALLOC
+        debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
+        #endif
     }
     #ifdef DEBUG_INIT
     debug("Initialising 'real_t' <- 0");
@@ -162,15 +162,20 @@ void real_add(const void* x1, const void* x2, void* res) {
         real_t pa = (const real_t)x1, pb = (const real_t)x2;
         if (!res) {
             res = malloc(SIZE_REAL);
-            #ifdef DEBUG_MALLOC
-            if (res) debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
-            #endif
             alloc_check(res);
+            #ifdef DEBUG_MALLOC
+            debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
+            #endif
         }
-        *(real_t)res = *pa + *pb;
         #ifdef DEBUG_OPERATION
-        debug("Operation 'real_t' <- "PRINT_REAL" = "PRINT_REAL" + "PRINT_REAL, *(real_t)res, *pa, *pb);
+        #ifdef __x86_64__
+        double a = *pa, b = *pb, x = *(real_t)res;
+        #else
+        float a = *pa, b = *pb;
         #endif
+        debug("Operation 'real_t' <- "PRINT_REAL" = "PRINT_REAL" + "PRINT_REAL, a + b, a, b);
+        #endif
+        *(real_t)res = *pa + *pb;
     }
     #ifdef DEBUG_CONTEXT
     debug("leaving function!\n");
@@ -187,15 +192,20 @@ void real_sub(const void* x1, const void* x2, void* res) {
         real_t pa = (const real_t)x1, pb = (const real_t)x2;
         if (!res) {
             res = malloc(SIZE_REAL);
-            #ifdef DEBUG_MALLOC
-            if (res) debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
-            #endif
             alloc_check(res);
+            #ifdef DEBUG_MALLOC
+            debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
+            #endif
         }
-        *(real_t)res = *pa - *pb;
         #ifdef DEBUG_OPERATION
-        debug("Operation 'real_t' <- "PRINT_REAL" = "PRINT_REAL" - "PRINT_REAL, *(real_t)res, *pa, *pb);
+        #ifdef __x86_64__
+        double a = *pa, b = *pb, x = *(real_t)res;
+        #else
+        float a = *pa, b = *pb;
         #endif
+        debug("Operation 'real_t' <- "PRINT_REAL" = "PRINT_REAL" - "PRINT_REAL, a - b, a, b);
+        #endif
+        *(real_t)res = *pa - *pb;
     }
     #ifdef DEBUG_CONTEXT
     debug("leaving function!\n");
@@ -212,15 +222,20 @@ void real_mult(const void* x1, const void* x2, void* res) {
         real_t pa = (const real_t)x1, pb = (const real_t)x2;
         if (!res) {
             res = malloc(SIZE_REAL);
-            #ifdef DEBUG_MALLOC
-            if (res) debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
-            #endif
             alloc_check(res);
+            #ifdef DEBUG_MALLOC
+            debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
+            #endif
         }
-        *(real_t)res = *pa * *pb;
         #ifdef DEBUG_OPERATION
-        debug("Operation 'real_t' <- "PRINT_REAL" = "PRINT_REAL" * "PRINT_REAL, *(real_t)res, *pa, *pb);
+        #ifdef __x86_64__
+        double a = *pa, b = *pb, x = *(real_t)res;
+        #else
+        float a = *pa, b = *pb;
         #endif
+        debug("Operation 'real_t' <- "PRINT_REAL" = "PRINT_REAL" * "PRINT_REAL, a * b, a, b);
+        #endif
+        *(real_t)res = *pa * *pb;
     }
     #ifdef DEBUG_CONTEXT
     debug("leaving function!\n");
@@ -242,15 +257,20 @@ void real_div(const void* x1, const void* x2, void* res) {
         real_t pa = (const real_t)x1, pb = (const real_t)x2;
         if (!res) {
             res = malloc(SIZE_REAL);
-            #ifdef DEBUG_MALLOC
-            if (res) debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
-            #endif
             alloc_check(res);
+            #ifdef DEBUG_MALLOC
+            debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
+            #endif
         }
-        *(real_t)res = *pa / *pb;
         #ifdef DEBUG_OPERATION
-        debug("Operation 'real_t' <- "PRINT_REAL" = "PRINT_REAL" / "PRINT_REAL, *(real_t)res, *pa, *pb);
+        #ifdef __x86_64__
+        double a = *pa, b = *pb, x = *(real_t)res;
+        #else
+        float a = *pa, b = *pb;
         #endif
+        debug("Operation 'real_t' <- "PRINT_REAL" = "PRINT_REAL" / "PRINT_REAL, a / b, a, b);
+        #endif
+        *(real_t)res = *pa / *pb;
     }
     #ifdef DEBUG_CONTEXT
     debug("leaving function!\n");

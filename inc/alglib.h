@@ -1,11 +1,11 @@
 #ifndef ALGLIB_H
 #define ALGLIB_H
 
-#include "entity.h"
-#include "real.h"
-#include "complexe.h"
-#include "vectors.h"
-#include "polynome.h"
+#include "structures/entity.h"
+#include "structures/real.h"
+#include "structures/complexe.h"
+#include "structures/vectors.h"
+#include "structures/polynome.h"
 
 // REAL NUMBERS
 
@@ -15,7 +15,7 @@ static const struct math real_entity = {
     real_delete, real_zero, real_one, real_inv,
     real_is_null, real_is_positive, real_is_negative,
     real_add, real_sub, real_mult, real_div,
-    real_print
+    math_accumulator, real_print
 };
 
 typedef void* (*math_real_new_t) (double);
@@ -28,7 +28,7 @@ static const struct math complexe_entity = {
     complexe_delete, complexe_zero, complexe_one, complexe_inv,
     complexe_is_null, math_test, math_test,
     complexe_add, complexe_sub, complexe_mult, complexe_div,
-    complexe_print
+    math_accumulator, complexe_print
 };
 
 typedef void* (*math_complexe_new_t) (double, double);
@@ -42,7 +42,7 @@ static const struct math vect_ligne_entity = {
     vect_delete, vect_zero, vect_one, vect_inv,
     vect_is_null, math_test, math_test,
     vect_add, vect_sub, vect_mult, math_operation,
-    vect_print_ligne
+    math_accumulator, vect_print_ligne
 };
 
 // COLUMN
@@ -53,7 +53,7 @@ static const struct math vect_colonne_entity = {
     vect_delete, vect_zero, vect_one, vect_inv,
     vect_is_null, math_test, math_test,
     vect_add, vect_sub, vect_mult, math_operation,
-    vect_print_colonne
+    math_accumulator, vect_print_colonne
 };
 
 typedef void* (*math_vect_new_t) (size_t, math_entity_t, ...);
@@ -66,7 +66,7 @@ static const struct math polynome_entity = {
     vect_delete, vect_zero, vect_one, vect_inv,
     vect_is_null, math_test, math_test,
     vect_add, vect_sub, vect_mult, math_operation,
-    vect_print_ligne
+    math_accumulator, polynome_print
 };
 
 // MATRIX
