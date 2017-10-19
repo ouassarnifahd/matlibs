@@ -10,7 +10,6 @@
 #include "error.h"   // handling errors/warnings/debug
 
 #define Mat_PI 3.1415926536
-
 #define Mat_exp 2.7182818285
 
 #define Mat_size(data) printf("%lu Octet\n", sizeof(data))

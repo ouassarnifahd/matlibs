@@ -21,8 +21,6 @@ ifeq ($(dbg_verbose), yes)
 dbgFlags	+= -D DEBUG_CONTEXT
 dbgFlags	+= -D DEBUG_MALLOC
 dbgFlags	+= -D DEBUG_FREE
-dbgFlags	+= -D DEBUG_INIT
-dbgFlags	+= -D DEBUG_OPERATION
 endif
 
 ifeq ($(dbg_verbose), alloc)
@@ -70,7 +68,7 @@ help:
 	@echo "the project is in developement"
 	@echo "make ./$(debugPath)/srcfile.dbg objects=\"object.o files.o dependencies.o if_there_is_any.o\""
 	@echo "NB: srcfile.c should have a main function in the DEBUG macro space"
-	@echo "ie: ./$(debugPath)/vectors.dbg objects=\"real.o complexe.o entity.o\""
+	@echo "ie: ./$(debugPath)/structures/vectors.dbg objects=\"structures/real.o structures/complexe.o structures/entity.o\""
 
 $(debugPath)/%.dbg: $(srcPath)/%.c $(inc)
 	@$(MAKE) directory path=$(dir $@)

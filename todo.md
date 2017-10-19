@@ -1,8 +1,12 @@
 # TODO
 
 * #### matrix
+    - add structures/matrix.h
 * #### Tensors
-* #### Polynome fractions
+    - add structures/tensor.h
+* #### Fractions
+    - add structures/fraction.h
 * #### accumulator generic (\+, \-, \*, /)
-* #### log and errors
-* #### load data from binaries
+    - mod structures/\*.h
+* #### mkdir if doesnt exist!
+    - mod libs/mfiles.h
