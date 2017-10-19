@@ -1,4 +1,4 @@
-#include "libs/liste.h"
+#include "data/liste.h"
 
 PTList TList_New(size_t sizeofElem) {
     #ifdef DEBUG_CONTEXT
@@ -304,19 +304,18 @@ void TList_Delete(const PTList this, deleteElem_t deleteElem) {
     #ifdef DEBUG_FREE
     debug("Memory freed (PTList)");
     #endif
-    this = NULL;
     #ifdef DEBUG_CONTEXT
     debug("leaving function!\n");
     #endif
 }
 
-void TList_Display(const PTList this, void (*display)(const void *)) {
+void TList_Display(const PTList this, displayElem_t display) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
     PTNode CurrentNode = this->First;
     size_t currentIndex = TList_GetIndex(this);
-    printf("Taille de la liste : %d\n", TList_Length(this));
+    printf("Taille de la liste : %zu\n", TList_Length(this));
     printf("Contenu : ");
     while (CurrentNode) {
         display(CurrentNode->pElement);
@@ -324,7 +323,7 @@ void TList_Display(const PTList this, void (*display)(const void *)) {
         CurrentNode = CurrentNode->Next;
     }
     printf("(null)\n");
-    printf("Position courante : %d\n", currentIndex);
+    printf("Position courante : %zu\n", currentIndex);
     if (TList_GetIndex(this) != -1) {
         printf("Element courant = ");
         display(TList_GoTo(this, currentIndex)->pElement);
@@ -337,7 +336,7 @@ void TList_Display(const PTList this, void (*display)(const void *)) {
 
 // Pile
 
-PTNode TPile_POP(const PTPile this, deleteElem) {
+PTNode TPile_POP(const PTPile this, deleteElem_t deleteElem) {
     PTNode pop = malloc(sizeof(TNode));
     alloc_check(pop);
     #ifdef DEBUG_MALLOC
