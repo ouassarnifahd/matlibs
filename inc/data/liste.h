@@ -12,6 +12,10 @@ typedef void (*deleteElem_t)(void *);
 
 typedef void (*displayElem_t)(const void *);
 
+typedef void* (*alloc_t)(size_t);
+
+typedef void (*free_t)(void *);
+
 typedef struct List {
     size_t  NumElems;
     size_t  SizeofElem;
@@ -21,7 +25,7 @@ typedef struct List {
     ssize_t Index;
 } TList, *PTList;
 
-PTList TList_New(size_t sizeofElem);
+PTList TList_New(alloc_t mem_alloc, size_t sizeofElem);
 
 bool TList_IsEmpty(const PTList list);
 
@@ -33,21 +37,21 @@ PTNode TList_GoTo(const PTList list, ssize_t Pos);
 
 ssize_t TList_GetIndex(const PTList list);
 
-PTNode TList_InsertFirst(const PTList list, void* pNewElt);
+PTNode TList_InsertFirst(const PTList list, void* pNewElt, alloc_t mem_alloc);
 
-bool TList_RemoveFirst(const PTList list, deleteElem_t deleteElem);
+bool TList_RemoveFirst(const PTList list, deleteElem_t deleteElem, free_t mem_free);
 
-PTNode TList_Add(const PTList list, void* pNewElt);
+PTNode TList_Add(const PTList list, void* pNewElt, alloc_t mem_alloc);
 
-bool TList_RemoveLast(const PTList list, deleteElem_t deleteElem);
+bool TList_RemoveLast(const PTList list, deleteElem_t deleteElem, free_t mem_free);
 
-PTNode TList_Insert(const PTList list, void* pNewElt);
+PTNode TList_Insert(const PTList list, void* pNewElt, alloc_t mem_alloc);
 
-bool TList_RemoveCurrent(const PTList list, deleteElem_t deleteElem);
+bool TList_RemoveCurrent(const PTList list, deleteElem_t deleteElem, free_t mem_free);
 
-void TList_Clear(const PTList list, deleteElem_t deleteElem);
+void TList_Clear(const PTList list, deleteElem_t deleteElem, free_t mem_free);
 
-void TList_Delete(const PTList list, deleteElem_t deleteElem);
+void TList_Delete(const PTList list, deleteElem_t deleteElem, free_t mem_free);
 
 void TList_Display(const PTList list, displayElem_t display);
 
@@ -57,10 +61,10 @@ typedef PTList PTPile;
 
 #define TPile_NEW(sizeofElem) TList_New(sizeofElem)
 
-#define TPile_PUSH(pile, pNewElt) TList_Add(pile, pNewElt)
+#define TPile_PUSH(pile, pNewElt, mem_alloc) TList_Add(pile, pNewElt, mem_alloc)
 
-PTNode TPile_POP(const PTPile pile, deleteElem);
+PTNode TPile_POP(const PTPile pile, deleteElem_t deleteElem, free_t mem_free);
 
-#define TPile_Delete(pile, deleteElem) TList_Delete(pile, deleteElem)
+#define TPile_Delete(pile, deleteElem, mem_free) TList_Delete(pile, deleteElem, mem_free)
 
 #endif /* end of include guard : LISTE_H */
