@@ -1,10 +1,10 @@
 #include "data/liste.h"
 
-PTList TList_New(size_t sizeofElem) {
+PTList TList_New(alloc_t mem_alloc, size_t sizeofElem) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
-    PTList this = malloc(sizeof(TList));
+    PTList this = mem_alloc(sizeof(TList));
     alloc_check(this);
     #ifdef DEBUG_MALLOC
     debug("Memory allocation 'PTList': %zu Octets", sizeof(TList));
@@ -71,16 +71,16 @@ PTNode TList_GoTo(const PTList this, ssize_t Pos) {
     return this->Current;
 }
 
-PTNode TList_InsertFirst(const PTList this, void* pNewElt) {
+PTNode TList_InsertFirst(const PTList this, void* pNewElt, alloc_t mem_alloc) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
-    PTNode newNode = malloc(sizeof(TNode));
+    PTNode newNode = mem_alloc(sizeof(TNode));
     alloc_check(newNode);
     #ifdef DEBUG_MALLOC
     debug("Memory allocation 'TNode': %zu Octets", sizeof(TNode));
     #endif
-    void* AddNewElt = malloc(TList_GetSizeofElem(this));
+    void* AddNewElt = mem_alloc(TList_GetSizeofElem(this));
     alloc_check(AddNewElt);
     #ifdef DEBUG_MALLOC
     debug("Memory allocation 'void*': %zu Octets", TList_GetSizeofElem(this));
@@ -98,7 +98,7 @@ PTNode TList_InsertFirst(const PTList this, void* pNewElt) {
     return newNode;
 }
 
-bool TList_RemoveFirst(const PTList this, deleteElem_t deleteElem) {
+bool TList_RemoveFirst(const PTList this, deleteElem_t deleteElem, free_t mem_free) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
@@ -111,7 +111,7 @@ bool TList_RemoveFirst(const PTList this, deleteElem_t deleteElem) {
     PTNode pNode    = this->First;
     PTNode nextNode = pNode->Next;
     deleteElem(pNode->pElement);
-    free(pNode);
+    mem_free(pNode);
     #ifdef DEBUG_FREE
     debug("Memory freed (PTNode)");
     #endif
@@ -126,16 +126,16 @@ bool TList_RemoveFirst(const PTList this, deleteElem_t deleteElem) {
     return 1;
 }
 
-PTNode TList_Add(const PTList this, void* pNewElt) {
+PTNode TList_Add(const PTList this, void* pNewElt, alloc_t mem_alloc) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
-    PTNode newNode = malloc(sizeof(TNode));
+    PTNode newNode = mem_alloc(sizeof(TNode));
     alloc_check(newNode);
     #ifdef DEBUG_MALLOC
     debug("Memory allocation 'TNode': %zu Octets", sizeof(TNode));
     #endif
-    void* AddNewElt = malloc(TList_GetSizeofElem(this));
+    void* AddNewElt = mem_alloc(TList_GetSizeofElem(this));
     alloc_check(AddNewElt);
     #ifdef DEBUG_MALLOC
     debug("Memory allocation 'void*': %zu Octets", TList_GetSizeofElem(this));
@@ -155,7 +155,7 @@ PTNode TList_Add(const PTList this, void* pNewElt) {
     return newNode;
 }
 
-bool TList_RemoveLast(const PTList this, deleteElem_t deleteElem) {
+bool TList_RemoveLast(const PTList this, deleteElem_t deleteElem, free_t mem_free) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
@@ -168,7 +168,7 @@ bool TList_RemoveLast(const PTList this, deleteElem_t deleteElem) {
     PTNode prevNode = this->First, pNode = prevNode->Next;
     if (!pNode) {
         deleteElem(prevNode->pElement);
-        free(prevNode);
+        mem_free(prevNode);
         #ifdef DEBUG_FREE
         debug("Memory freed (PTNode)");
         #endif
@@ -180,7 +180,7 @@ bool TList_RemoveLast(const PTList this, deleteElem_t deleteElem) {
             pNode = pNode->Next;
         }
         deleteElem(pNode->pElement);
-        free(pNode);
+        mem_free(pNode);
         #ifdef DEBUG_FREE
         debug("Memory freed (PTNode)");
         #endif
@@ -195,7 +195,7 @@ bool TList_RemoveLast(const PTList this, deleteElem_t deleteElem) {
     return true;
 }
 
-PTNode TList_Insert(const PTList this, void* pNewElt) {
+PTNode TList_Insert(const PTList this, void* pNewElt, alloc_t mem_alloc) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
@@ -209,12 +209,12 @@ PTNode TList_Insert(const PTList this, void* pNewElt) {
         this->First = TList_InsertFirst(this, pNewElt);
         this->Current = this->First;
     } else {
-        PTNode newNode = malloc(sizeof(TNode));
+        PTNode newNode = mem_alloc(sizeof(TNode));
         alloc_check(newNode);
         #ifdef DEBUG_MALLOC
         debug("Memory allocation 'TNode': %zu Octets", sizeof(TNode));
         #endif
-        void* AddNewElt = malloc(TList_GetSizeofElem(this));
+        void* AddNewElt = mem_alloc(TList_GetSizeofElem(this));
         alloc_check(AddNewElt);
         #ifdef DEBUG_MALLOC
         debug("Memory allocation 'void*': %zu Octets", TList_GetSizeofElem(this));
@@ -234,7 +234,7 @@ PTNode TList_Insert(const PTList this, void* pNewElt) {
     return this->Current;
 }
 
-bool TList_RemoveCurrent(const PTList this, deleteElem_t deleteElem) {
+bool TList_RemoveCurrent(const PTList this, deleteElem_t deleteElem, free_t mem_free) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
@@ -271,7 +271,7 @@ bool TList_RemoveCurrent(const PTList this, deleteElem_t deleteElem) {
         TList_GoTo(this, TList_GetIndex(this) - 1);
         this->Current->Next = pNodeToRemove->Next;
         deleteElem(pNodeToRemove->pElement);
-        free(pNodeToRemove);
+        mem_free(pNodeToRemove);
         #ifdef DEBUG_FREE
         debug("Memory freed (PTNode)");
         #endif
@@ -285,21 +285,21 @@ bool TList_RemoveCurrent(const PTList this, deleteElem_t deleteElem) {
     }
 }
 
-void TList_Clear(const PTList this, deleteElem_t deleteElem) {
+void TList_Clear(const PTList this, deleteElem_t deleteElem, free_t mem_free) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
-    while(TList_RemoveLast(this, deleteElem));
+    while(TList_RemoveLast(this, deleteElem, mem_free));
     #ifdef DEBUG_CONTEXT
     debug("leaving function!\n");
     #endif
 }
 
-void TList_Delete(const PTList this, deleteElem_t deleteElem) {
+void TList_Delete(const PTList this, deleteElem_t deleteElem, free_t mem_free) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
-    TList_Clear(this, deleteElem);
+    TList_Clear(this, deleteElem, mem_free);
     free(this);
     #ifdef DEBUG_FREE
     debug("Memory freed (PTList)");
@@ -336,20 +336,20 @@ void TList_Display(const PTList this, displayElem_t display) {
 
 // Pile
 
-PTNode TPile_POP(const PTPile this, deleteElem_t deleteElem) {
-    PTNode pop = malloc(sizeof(TNode));
+PTNode TPile_POP(const PTPile this, deleteElem_t deleteElem, free_t mem_free) {
+    PTNode pop = mem_alloc(sizeof(TNode));
     alloc_check(pop);
     #ifdef DEBUG_MALLOC
     debug("Memory allocation 'TNode': %zu Octets", sizeof(TNode));
     #endif
     memcpy(pop, TList_GoTo(this, TList_Length(this) - 1), TList_GetSizeofElem(this));
-    if (TList_RemoveLast(this, deleteElem)) {
+    if (TList_RemoveLast(this, deleteElem, mem_free)) {
         #ifdef DEBUG_CONTEXT
         debug("leaving function!\n");
         #endif
         return pop;
     } else {
-        free(pop);
+        mem_free(pop);
         #ifdef DEBUG_FREE
         debug("Memory freed (PTNode)");
         #endif
