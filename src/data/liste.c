@@ -71,6 +71,22 @@ PTNode TList_GoTo(const PTList this, ssize_t Pos) {
     return this->Current;
 }
 
+PTNode TList_Find(const PTList this, const void* elt, compareElem_t equal) {
+    #ifdef DEBUG_CONTEXT
+    debug("Entering function!");
+    #endif
+    this->Current = this->First;
+    this->Index = 0;
+    while(this->Index < TList_Length(this) && !equal(this->Current->pElement, elt)) {
+        this->Current = this->Current->Next;
+        this->Index++;
+    }
+    #ifdef DEBUG_CONTEXT
+    debug("leaving function!\n");
+    #endif
+    return this->Current;
+}
+
 PTNode TList_InsertFirst(const PTList this, void* pNewElt, alloc_t mem_alloc) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");

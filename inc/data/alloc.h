@@ -3,20 +3,17 @@
 
 #include "liste.h"
 
-#define Kio 1ull << 10
-#define Mio 1ull << 20
-#define Gio 1ull << 30
+#define Kio (1ull << 10)
+#define Mio (1ull << 20)
+#define Gio (1ull << 30)
+
+#define MAX_MEMORY 10 * Mio
 
 typedef struct partition {
     void* start;
+    void* data;
     void* end;
 } partition_t;
-
-size_t get_partition_size(partition_t chunk);
-
-bool partition_can_merge(partition_t chunk1, partition_t chunk2);
-
-partition_t partition_merge(partition_t chunk1, partition_t chunk2);
 
 static struct List alloc_segment = {
     0, sizeof(struct partition),
@@ -42,14 +39,14 @@ static struct memory global_memory = {
     NULL, 0, 0, 0, 0, &alloc_segment, &free_segment
 };
 
-void memory_get(size_t size_global);
+void memory_get(const memory_t global, size_t size_global);
 
-void memory_resize(size_t new_size_global);
+void memory_resize(const memory_t global, size_t new_size_global);
 
-void* memory_alloc(size_t size);
+void* memory_alloc(const memory_t global, size_t size);
 
-void* memory_realloc(void* pointer, size_t size);
+void* memory_realloc(const memory_t global, void* pointer, size_t size);
 
-void memory_free(void* pointer);
+void memory_free(const memory_t global, void* pointer);
 
 #endif /* end of include guard: ALLOC_H */
