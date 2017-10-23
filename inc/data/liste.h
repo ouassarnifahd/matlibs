@@ -16,10 +16,6 @@ typedef void (*displayElem_t)(const void *);
 
 typedef bool (*compareElem_t)(const void *, const void *);
 
-typedef void* (*alloc_t)(size_t);
-
-typedef void (*free_t)(void *);
-
 typedef struct List {
     size_t  NumElems;
     size_t  SizeofElem;
@@ -44,6 +40,8 @@ PTNode TList_Find(const PTList list, const void* elt, compareElem_t equal);
 ssize_t TList_GetIndex(const PTList list);
 
 PTNode TList_InsertFirst(const PTList list, void* pNewElt, alloc_t mem_alloc);
+
+PTNode TList_InsertNodeFirst(const PTList list, PTNode newNode);
 
 bool TList_RemoveFirst(const PTList list, deleteElem_t deleteElem, free_t mem_free);
 
@@ -71,9 +69,9 @@ typedef PTList PTPile;
 
 #define TPile_NEW(sizeofElem) TList_New(sizeofElem)
 
-#define TPile_PUSH(pile, pNewElt, mem_alloc) TList_Add(pile, pNewElt, mem_alloc)
+#define TPile_PUSH(pile, newNode) TList_AddNode(pile, newNode)
 
-PTNode TPile_POP(const PTPile pile, deleteElem_t deleteElem, free_t mem_free);
+PTNode TPile_POP(const PTPile pile, deleteElem_t deleteElem, alloc_t mem_alloc, free_t mem_free);
 
 #define TPile_Delete(pile, deleteElem, mem_free) TList_Delete(pile, deleteElem, mem_free)
 

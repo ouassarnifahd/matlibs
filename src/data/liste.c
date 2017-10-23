@@ -114,6 +114,22 @@ PTNode TList_InsertFirst(const PTList this, void* pNewElt, alloc_t mem_alloc) {
     return newNode;
 }
 
+PTNode TList_InsertNodeFirst(const PTList this, PTNode newNode) {
+    #ifdef DEBUG_CONTEXT
+    debug("Entering function!");
+    #endif
+    newNode->Next = this->First;
+    if(TList_IsEmpty(this))
+        this->Last = newNode;
+    this->First = newNode;
+    this->NumElems++;
+    this->Index = 0;
+    #ifdef DEBUG_CONTEXT
+    debug("leaving function!\n");
+    #endif
+    return newNode;
+}
+
 bool TList_RemoveFirst(const PTList this, deleteElem_t deleteElem, free_t mem_free) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
@@ -158,6 +174,23 @@ PTNode TList_Add(const PTList this, void* pNewElt, alloc_t mem_alloc) {
     #endif
     memcpy(AddNewElt, pNewElt, TList_GetSizeofElem(this));
     newNode->pElement = AddNewElt;
+    if(TList_IsEmpty(this))
+        this->First = newNode;
+    else
+        this->Last->Next = newNode;
+    this->Last = newNode;
+    this->NumElems++;
+    this->Index = this->NumElems - 1;
+    #ifdef DEBUG_CONTEXT
+    debug("leaving function!\n");
+    #endif
+    return newNode;
+}
+
+PTNode TList_AddNode(const PTList this, PTNode newNode) {
+    #ifdef DEBUG_CONTEXT
+    debug("Entering function!");
+    #endif
     if(TList_IsEmpty(this))
         this->First = newNode;
     else
@@ -222,7 +255,7 @@ PTNode TList_Insert(const PTList this, void* pNewElt, alloc_t mem_alloc) {
         return NULL;
     }
     if (this->First == this->Current) {
-        this->First = TList_InsertFirst(this, pNewElt);
+        this->First = TList_InsertFirst(this, pNewElt, mem_alloc);
         this->Current = this->First;
     } else {
         PTNode newNode = mem_alloc(sizeof(TNode));
@@ -250,6 +283,32 @@ PTNode TList_Insert(const PTList this, void* pNewElt, alloc_t mem_alloc) {
     return this->Current;
 }
 
+PTNode TList_InsertNode(const PTList this, PTNode newNode) {
+    #ifdef DEBUG_CONTEXT
+    debug("Entering function!");
+    #endif
+    if (!this->Current) {
+        #ifdef DEBUG_CONTEXT
+        debug("leaving function!\n");
+        #endif
+        return NULL;
+    }
+    if (this->First == this->Current) {
+        this->Current = TList_InsertNodeFirst(this, newNode);
+    } else {
+        newNode->Next = this->Current;
+        this->Current = TList_GoTo(this, TList_GetIndex(this) - 1);
+        this->Current->Next = newNode;
+        this->Current = newNode;
+        this->Index++;
+        this->NumElems++;
+    }
+    #ifdef DEBUG_CONTEXT
+    debug("leaving function!\n");
+    #endif
+    return this->Current;
+}
+
 bool TList_RemoveCurrent(const PTList this, deleteElem_t deleteElem, free_t mem_free) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
@@ -261,7 +320,7 @@ bool TList_RemoveCurrent(const PTList this, deleteElem_t deleteElem, free_t mem_
         #endif
         return 0;
     } else if (this->Current == this->First) {
-        status = TList_RemoveFirst(this, deleteElem);
+        status = TList_RemoveFirst(this, deleteElem, mem_free);
         if (status) {
             this->Current = this->First;
             if (!this->Current)
@@ -272,7 +331,7 @@ bool TList_RemoveCurrent(const PTList this, deleteElem_t deleteElem, free_t mem_
         #endif
         return status;
     } else if (this->Current == this->Last) {
-        status = TList_RemoveLast(this, deleteElem);
+        status = TList_RemoveLast(this, deleteElem, mem_free);
         if (status) {
             this->Current = this->Last;
             if (!this->Current)
@@ -352,7 +411,7 @@ void TList_Display(const PTList this, displayElem_t display) {
 
 // Pile
 
-PTNode TPile_POP(const PTPile this, deleteElem_t deleteElem, free_t mem_free) {
+PTNode TPile_POP(const PTPile this, deleteElem_t deleteElem, alloc_t mem_alloc, free_t mem_free) {
     PTNode pop = mem_alloc(sizeof(TNode));
     alloc_check(pop);
     #ifdef DEBUG_MALLOC

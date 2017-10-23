@@ -9,6 +9,9 @@
 
 #include "error.h"   // handling errors/warnings/debug
 
+typedef void* (*alloc_t)(size_t);
+typedef void (*free_t)(void *);
+
 #define Mat_PI 3.1415926536
 #define Mat_exp 2.7182818285
 

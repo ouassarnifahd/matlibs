@@ -43,6 +43,8 @@ void memory_get(const memory_t global, size_t size_global);
 
 void memory_resize(const memory_t global, size_t new_size_global);
 
+void memory_let(const memory_t global);
+
 void* memory_alloc(const memory_t global, size_t size);
 
 void* memory_realloc(const memory_t global, void* pointer, size_t size);
