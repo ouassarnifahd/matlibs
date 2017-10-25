@@ -40,26 +40,28 @@ PTNode TList_Find(const PTList list, const void* elt, compareElem_t equal);
 ssize_t TList_GetIndex(const PTList list);
 
 PTNode TList_InsertFirst(const PTList list, void* pNewElt, alloc_t mem_alloc);
-
 PTNode TList_InsertNodeFirst(const PTList list, PTNode newNode);
 
 bool TList_RemoveFirst(const PTList list, deleteElem_t deleteElem, free_t mem_free);
+bool TList_RemoveFirstNode(const PTList list);
 
 PTNode TList_Add(const PTList list, void* pNewElt, alloc_t mem_alloc);
-
 PTNode TList_AddNode(const PTList list, PTNode newNode);
 
 bool TList_RemoveLast(const PTList list, deleteElem_t deleteElem, free_t mem_free);
+bool TList_RemoveLastNode(const PTList list);
 
 PTNode TList_Insert(const PTList list, void* pNewElt, alloc_t mem_alloc);
-
 PTNode TList_InsertNode(const PTList list, PTNode newNode);
 
 bool TList_RemoveCurrent(const PTList list, deleteElem_t deleteElem, free_t mem_free);
+bool TList_RemoveCurrentNode(const PTList list);
 
 void TList_Clear(const PTList list, deleteElem_t deleteElem, free_t mem_free);
+void TList_ClearNode(const PTList list);
 
 void TList_Delete(const PTList list, deleteElem_t deleteElem, free_t mem_free);
+void TList_DeleteNode(const PTList list);
 
 void TList_Display(const PTList list, displayElem_t display);
 
@@ -67,11 +69,13 @@ void TList_Display(const PTList list, displayElem_t display);
 
 typedef PTList PTPile;
 
-#define TPile_NEW(sizeofElem) TList_New(sizeofElem)
+#define TPile_NEW(mem_alloc, sizeofElem) TList_New(mem_alloc, sizeofElem)
 
-#define TPile_PUSH(pile, newNode) TList_AddNode(pile, newNode)
+#define TPile_PUSH(pile, pNewElt, mem_alloc) TList_Add(pile, pNewElt, mem_alloc)
+#define TPile_PUSHNode(pile, newNode) TList_AddNode(pile, newNode)
 
 PTNode TPile_POP(const PTPile pile, deleteElem_t deleteElem, alloc_t mem_alloc, free_t mem_free);
+PTNode TPile_POPNode(const PTPile pile);
 
 #define TPile_Delete(pile, deleteElem, mem_free) TList_Delete(pile, deleteElem, mem_free)
 

@@ -158,6 +158,30 @@ bool TList_RemoveFirst(const PTList this, deleteElem_t deleteElem, free_t mem_fr
     return 1;
 }
 
+bool TList_RemoveFirstNode(const PTList this) {
+    #ifdef DEBUG_CONTEXT
+    debug("Entering function!");
+    #endif
+    if(TList_IsEmpty(this)) {
+        #ifdef DEBUG_CONTEXT
+        debug("leaving function!\n");
+        #endif
+        return 0;
+    }
+    PTNode pNode    = this->First;
+    PTNode nextNode = pNode->Next;
+    pNode->pElement = NULL;
+    this->First = nextNode;
+    this->NumElems--;
+    this->Index = 0;
+    if(TList_IsEmpty(this))
+        this->Last = NULL;
+    #ifdef DEBUG_CONTEXT
+    debug("leaving function!\n");
+    #endif
+    return 1;
+}
+
 PTNode TList_Add(const PTList this, void* pNewElt, alloc_t mem_alloc) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
@@ -233,6 +257,36 @@ bool TList_RemoveLast(const PTList this, deleteElem_t deleteElem, free_t mem_fre
         #ifdef DEBUG_FREE
         debug("Memory freed (PTNode)");
         #endif
+        prevNode->Next = NULL;
+        this->Last = prevNode;
+    }
+    this->NumElems--;
+    this->Index = this->NumElems - 1;
+    #ifdef DEBUG_CONTEXT
+    debug("leaving function!\n");
+    #endif
+    return true;
+}
+
+bool TList_RemoveLastNode(const PTList this) {
+    #ifdef DEBUG_CONTEXT
+    debug("Entering function!");
+    #endif
+    if (TList_IsEmpty(this)) {
+        #ifdef DEBUG_CONTEXT
+        debug("leaving function!\n");
+        #endif
+        return 0;
+    }
+    PTNode prevNode = this->First, pNode = prevNode->Next;
+    if (!pNode) {
+        this->First = NULL;
+        this->Last = NULL;
+    } else {
+        while (pNode->Next) {
+            prevNode = pNode;
+            pNode = pNode->Next;
+        }
         prevNode->Next = NULL;
         this->Last = prevNode;
     }
@@ -360,6 +414,52 @@ bool TList_RemoveCurrent(const PTList this, deleteElem_t deleteElem, free_t mem_
     }
 }
 
+bool TList_RemoveCurrentNode(const PTList this) {
+    #ifdef DEBUG_CONTEXT
+    debug("Entering function!");
+    #endif
+    bool status = (TList_IsEmpty(this) || !this->Current);
+    if (status) {
+        #ifdef DEBUG_CONTEXT
+        debug("leaving function!\n");
+        #endif
+        return 0;
+    } else if (this->Current == this->First) {
+        status = TList_RemoveFirstNode(this);
+        if (status) {
+            this->Current = this->First;
+            if (!this->Current)
+                this->Index = -1;
+        }
+        #ifdef DEBUG_CONTEXT
+        debug("leaving function!\n");
+        #endif
+        return status;
+    } else if (this->Current == this->Last) {
+        status = TList_RemoveLastNode(this);
+        if (status) {
+            this->Current = this->Last;
+            if (!this->Current)
+                this->Index = -1;
+        }
+        #ifdef DEBUG_CONTEXT
+        debug("leaving function!\n");
+        #endif
+        return status;
+    } else {
+        PTNode pNodeToRemove = this->Current;
+        TList_GoTo(this, TList_GetIndex(this) - 1);
+        this->Current->Next = pNodeToRemove->Next;
+        this->Current = this->Current->Next;
+        this->Index++;
+        this->NumElems--;
+        #ifdef DEBUG_CONTEXT
+        debug("leaving function!\n");
+        #endif
+        return 1;
+    }
+}
+
 void TList_Clear(const PTList this, deleteElem_t deleteElem, free_t mem_free) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
@@ -433,4 +533,9 @@ PTNode TPile_POP(const PTPile this, deleteElem_t deleteElem, alloc_t mem_alloc, 
         #endif
         return NULL;
     }
+}
+
+PTNode TPile_POPNode(const PTPile this) {
+    // this->NumElems--;
+    return TList_GoTo(this, TList_Length(this) - 1);
 }
