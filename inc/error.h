@@ -1,6 +1,8 @@
 #ifndef ERROR_H
 #define ERROR_H
 
+#include <time.h>
+
 #define BUFFER_SIZE 128
 
 #define LOGFILE_PATH "./debug/logfile.mlb"
@@ -10,6 +12,19 @@ char out_str[BUFFER_SIZE];
 char log_str[BUFFER_SIZE];
 
 static FILE* logfile = NULL;
+
+#define init_log() \
+    logfile = fopen(LOGFILE_PATH, "w"); \
+    if (!logfile) { \
+        fprintf(stderr, "\033[0;31m[ERROR]\033[0m '%s' wont open!\n", LOGFILE_PATH); \
+        exit(EXIT_FAILURE); \
+    } \
+    time_t now; now = time(NULL); \
+    fprintf(logfile, "###########################################################\n"); \
+    fprintf(logfile, "# Compiled on %s at %s\n", __DATE__, __TIME__); \
+    fprintf(logfile, "# Executed on %s", ctime(&now)); \
+    fprintf(logfile, "###########################################################\n\n"); \
+    fflush(logfile); fclose(logfile); logfile = NULL
 
 #define log(str) \
     logfile = fopen(LOGFILE_PATH, "a"); \

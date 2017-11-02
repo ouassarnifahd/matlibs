@@ -1,7 +1,7 @@
 #ifndef REAL_H
 #define REAL_H
 
-#include "common.h"
+#include <stdbool.h>
 
 #ifdef __x86_64__
 

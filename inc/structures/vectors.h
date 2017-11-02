@@ -1,6 +1,7 @@
 #ifndef VECTORS_H
 #define VECTORS_H
 
+#include <stdarg.h>  // args (...)
 #include "common.h"
 #include "entity.h"
 

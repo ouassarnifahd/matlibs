@@ -1,7 +1,6 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <stdarg.h>  // args (...)
 #include <stdbool.h> // bool defs
 #include <stdlib.h>  // malloc & free
 #include <stdio.h>   // printf

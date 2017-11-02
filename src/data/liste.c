@@ -1,3 +1,4 @@
+#include "common.h"
 #include "data/liste.h"
 
 PTList TList_New(alloc_t mem_alloc, size_t sizeofElem) {
@@ -536,6 +537,9 @@ PTNode TPile_POP(const PTPile this, deleteElem_t deleteElem, alloc_t mem_alloc, 
 }
 
 PTNode TPile_POPNode(const PTPile this) {
-    // this->NumElems--;
-    return TList_GoTo(this, TList_Length(this) - 1);
+    PTNode pop = TList_GoTo(this, TList_Length(this) - 1);
+    // if (!TList_RemoveLastNode(this)) {
+    //     pop = NULL;
+    // }
+    return pop;
 }

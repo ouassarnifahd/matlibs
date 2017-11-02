@@ -6,6 +6,8 @@ MKDIR 		:= mkdir -p
 wFlags 		:= -Wall -O0
 Archs 		:= -arch x86_64
 Frameworks 	:= -framework OpenCL
+Libs		:= -lSDL
+GCCFlags	:= $(wFlags) $(Archs)
 srcPath	    := src
 clPath		:= cl
 incPath		:= inc
@@ -15,7 +17,7 @@ debugPath	:= debug
 Project		:= matlib
 
 #Debug
-dbgFlags	:= $(wFlag) -g -D DEBUG
+dbgFlags	:= $(GCCFlags) -g -D DEBUG
 
 ifeq ($(dbg_verbose), yes)
 dbgFlags	+= -D DEBUG_CONTEXT
@@ -37,8 +39,13 @@ ifeq ($(dbg_verbose), context)
 dbgFlags	+= -D DEBUG_CONTEXT
 endif
 
+ifeq ($(dbg_verbose), memory)
+dbgFlags	+= -D DEBUG_MEMORY
+endif
+
 ifeq ($(dbg_verbose), all)
 dbgFlags	+= -D DEBUG_CONTEXT
+dbgFlags	+= -D DEBUG_MEMORY
 dbgFlags	+= -D DEBUG_MALLOC
 dbgFlags	+= -D DEBUG_FREE
 dbgFlags	+= -D DEBUG_INIT

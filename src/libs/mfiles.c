@@ -15,7 +15,7 @@ static void setPathNameExt(path_t *fpath, char* path, char* name, char* ext) {
     #ifdef DEBUG_CONTEXT
     debug("String copy function!");
     #endif
-    size_t lpath = 0, lname = 0;
+    size_t lpath = 0, lname = 0, lext = 0;
     for (size_t i = 0; i < MAX_PATH_SIZE && path[i] != '\0'; i++) {
         fpath->path[i] = path[i];
         lpath = i + 1;
@@ -25,10 +25,13 @@ static void setPathNameExt(path_t *fpath, char* path, char* name, char* ext) {
         fpath->path[lpath + i] = name[i];
         lname = i + 1;
     }
-    for (size_t i = 0; i < MAX_EXT_SIZE  && ext[i]   != '\0'; i++) {
+    for (size_t i = 0; i < MAX_EXT_SIZE && ext[i] != '\0'; i++) {
         fpath->ext[i] = ext[i];
         fpath->path[lpath + lname + i] = ext[i];
+        lext = i + 1;
     }
+    lpath += lname + lext;
+    fpath->path[lpath] = '\0';
 }
 
 static void getPathNameExt(path_t *fpath, char* path) {
@@ -52,7 +55,7 @@ static void getPathNameExt(path_t *fpath, char* path) {
     }
 }
 
-file_t file_new(char* fname, const void* data, size_t size) {
+file_t file_new(char* fname, const void* data, uint32_t size) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
@@ -62,18 +65,18 @@ file_t file_new(char* fname, const void* data, size_t size) {
     debug("Memory allocation 'file_t': %zu Octets", sizeof(struct Mat_file));
     #endif
     setPathNameExt(&new->fpath, SAVE_DIR, fname, DEFAULT_EXT);
-    new->fsize.size = size;
+    new->fsize = size;
     if (size < MAX_FILE_SIZE) {
         new->fdata = malloc(size);
         alloc_check(new->fdata);
         #ifdef DEBUG_MALLOC
-        debug("Memory allocation 'void*': %zu Octets", size);
+        debug("Memory allocation 'void*': %u Octets", size);
         #endif
         memcpy(new->fdata, data, size);
     } else {
         error("Max file size exceeded!");
     }
-    md5_check(new->fdata, new->fsize.size, new->fchecksum);
+    md5_check(new->fdata, new->fsize, new->fchecksum);
     new->fptr = NULL;
     #ifdef DEBUG_CONTEXT
     debug("leaving function!\n");
@@ -108,33 +111,19 @@ void file_delete(file_t mfile) {
     #endif
 }
 
-static size_t getLastSignificantByte(sizem_t usize) {
-    size_t size = sizeof(size_t);
-    for (size_t i = 0; i < sizeof(size_t) - 1; i += 2) {
-        if (usize.mem[i] == 0 && usize.mem[i + 1] == 0) {
-            size--;
-        }
-        printf("%hhx, %hhx, ", usize.mem[i], usize.mem[i + 1]);
-    }
-    printf("\n");
-    return (size < 8)? ((size < 4)? 4: 8): 8;
-}
-
 void file_export(file_t mfile) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
     mfile->fptr = fopen(mfile->fpath.path, "wb");
     if (mfile->fptr) {
-        size_t sizeofSizeD = getLastSignificantByte(mfile->fsize);
-        printf("%zu\n", sizeofSizeD);
-        size_t hsize = HEADER_SIZE(sizeofSizeD);
+        size_t hsize = HEADER_SIZE;
         fwrite(HEADER_BEGIN, 1, 4, mfile->fptr);
         fwrite(&hsize, 1, 2, mfile->fptr);
         fwrite(mfile->fchecksum, 1, 16, mfile->fptr);
-        fwrite(&mfile->fsize, 1, sizeofSizeD, mfile->fptr);
+        fwrite(&mfile->fsize, 1, 4, mfile->fptr);
         fwrite(HEADER_END, 1, 8, mfile->fptr);
-        fwrite(mfile->fdata, 1, mfile->fsize.size, mfile->fptr);
+        fwrite(mfile->fdata, 1, mfile->fsize, mfile->fptr);
         fclose(mfile->fptr);
         mfile->fptr = NULL;
     } else {
@@ -157,14 +146,19 @@ file_t file_import(char* path) {
     getPathNameExt(&import->fpath, path);
     import->fptr = fopen(path, "rb");
     if (import->fptr) {
+        char hb[4], he[8];
+        uint32_t start = 0;
+        fread(hb, 1, 4, import->fptr);
+        fread(&start, 1, 2, import->fptr);
         fread(import->fchecksum, 1, 16, import->fptr);
-        fread(&import->fsize.size, 1, sizeof(size_t), import->fptr);
-        import->fdata = malloc(import->fsize.size);
+        fread(&import->fsize, 1, 4, import->fptr);
+        fread(he, 1, 8, import->fptr);
+        import->fdata = malloc(import->fsize);
         alloc_check(import->fdata);
         #ifdef DEBUG_MALLOC
-        debug("Memory allocation 'void*': %zu Octets", import->fsize.size);
+        debug("Memory allocation 'void*': %u Octets", import->fsize);
         #endif
-        fread(import->fdata, 1, import->fsize.size, import->fptr);
+        fread(import->fdata, 1, import->fsize, import->fptr);
         fclose(import->fptr);
         import->fptr = NULL;
     } else {
@@ -172,7 +166,7 @@ file_t file_import(char* path) {
     }
     md5sum_t testsum;
     bool test = 1;
-    md5_check(import->fdata, import->fsize.size, testsum);
+    md5_check(import->fdata, import->fsize, testsum);
     for (size_t i = 0; i < 16 && test; i++) {
         test = testsum[i] == import->fchecksum[i];
     }
@@ -187,6 +181,7 @@ file_t file_import(char* path) {
 
 #ifdef DEBUG
 int main(int argc, char const *argv[]) {
+    init_log();
     #if defined (__x86_64__)
         debug("64-bit architecture!\n");
     #elif defined (__i386__)
@@ -194,12 +189,13 @@ int main(int argc, char const *argv[]) {
     #else
         error("Incompatible architecture!");
     #endif
-    char data[Kio];
-    file_t sdata = file_new("helloworld", data, Kio);
+    memory_get(&global_memory, Mio + Kio);
+    char* data = memory_alloc(&global_memory, Mio);
+    file_t sdata = file_new("helloworld", data, Mio);
     file_export(sdata);
     file_delete(sdata);
-    // file_t fstr = file_import("lib/helloworld.mlb");
-    // file_delete(fstr);
+    memory_free(&global_memory, data);
+    memory_let(&global_memory);
     debug("FY!");
     return 0;
 }

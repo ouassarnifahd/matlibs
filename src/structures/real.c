@@ -1,3 +1,5 @@
+#include "common.h"
+#include "data/alloc.h"
 #include "structures/real.h"
 
 double Mat_pow(double x, size_t n) {
@@ -19,7 +21,7 @@ void* real_new(double x) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
-    real_t new = malloc(SIZE_REAL);
+    real_t new = Mat_alloc(SIZE_REAL);
     alloc_check(new);
     #ifdef DEBUG_MALLOC
     debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
@@ -39,7 +41,7 @@ void real_delete(void* x) {
     debug("Entering function!");
     #endif
     if (x) {
-        free(x);
+        Mat_free(x);
         #ifdef DEBUG_FREE
         debug("Memory freed (real_t)");
         #endif
@@ -102,7 +104,7 @@ void real_zero(void* x) {
     debug("Entering function!");
     #endif
     if (!x) {
-        x = malloc(SIZE_REAL);
+        x = Mat_alloc(SIZE_REAL);
         #ifdef DEBUG_MALLOC
         if (x) debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
         #endif
@@ -122,7 +124,7 @@ void real_one(void* x) {
     debug("Entering function!");
     #endif
     if (!x) {
-        x = malloc(SIZE_REAL);
+        x = Mat_alloc(SIZE_REAL);
         alloc_check(x);
         #ifdef DEBUG_MALLOC
         debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
@@ -161,7 +163,7 @@ void real_add(const void* x1, const void* x2, void* res) {
     } else {
         real_t pa = (const real_t)x1, pb = (const real_t)x2;
         if (!res) {
-            res = malloc(SIZE_REAL);
+            res = Mat_alloc(SIZE_REAL);
             alloc_check(res);
             #ifdef DEBUG_MALLOC
             debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
@@ -191,7 +193,7 @@ void real_sub(const void* x1, const void* x2, void* res) {
     } else {
         real_t pa = (const real_t)x1, pb = (const real_t)x2;
         if (!res) {
-            res = malloc(SIZE_REAL);
+            res = Mat_alloc(SIZE_REAL);
             alloc_check(res);
             #ifdef DEBUG_MALLOC
             debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
@@ -221,7 +223,7 @@ void real_mult(const void* x1, const void* x2, void* res) {
     } else {
         real_t pa = (const real_t)x1, pb = (const real_t)x2;
         if (!res) {
-            res = malloc(SIZE_REAL);
+            res = Mat_alloc(SIZE_REAL);
             alloc_check(res);
             #ifdef DEBUG_MALLOC
             debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);
@@ -256,7 +258,7 @@ void real_div(const void* x1, const void* x2, void* res) {
     } else {
         real_t pa = (const real_t)x1, pb = (const real_t)x2;
         if (!res) {
-            res = malloc(SIZE_REAL);
+            res = Mat_alloc(SIZE_REAL);
             alloc_check(res);
             #ifdef DEBUG_MALLOC
             debug("Memory allocation 'real_t': %zu Octets", SIZE_REAL);

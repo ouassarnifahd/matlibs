@@ -1,7 +1,6 @@
 #ifndef COMPLEXE_H
 #define COMPLEXE_H
 
-#include "common.h"
 #include "real.h"
 
 typedef union complexe {

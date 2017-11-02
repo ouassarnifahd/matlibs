@@ -1,16 +1,21 @@
+#include "common.h"
+#include "data/alloc.h"
 #include "structures/complexe.h"
 
 void* complexe_new(double real, double imaginary) {
     #ifdef DEBUG_CONTEXT
     debug("Entering function!");
     #endif
-    complexe_t new = malloc(SIZE_COMPLEXE);
+    complexe_t new = Mat_alloc(SIZE_COMPLEXE);
     #ifdef DEBUG_MALLOC
     if (new) debug("Memory allocation 'complexe_t': %zu Octets", SIZE_COMPLEXE);
     #endif
     alloc_check(new);
-    new->alg.ztab[0] = real_new(real);
-    new->alg.ztab[1] = real_new(imaginary);
+    real_t new_real = real_new(real), new_imaginary = real_new(imaginary);
+    memcpy(&new->alg.ztab[0], new_real, SIZE_REAL);
+    memcpy(&new->alg.ztab[1], new_imaginary, SIZE_REAL);
+    real_delete(new_real);
+    real_delete(new_imaginary);
     #ifdef DEBUG_CONTEXT
     debug("leaving function!\n");
     #endif
@@ -28,7 +33,7 @@ void complexe_delete(void* z) {
         #ifdef DEBUG_FREE
         debug("Memory freed (complexe_t)");
         #endif
-        free(del);
+        Mat_free(del);
         del = NULL;
     }
     #ifdef DEBUG_CONTEXT
@@ -86,7 +91,7 @@ void complexe_zero(void* z) {
     debug("Entering function!");
     #endif
     if (!z) {
-        z = malloc(SIZE_COMPLEXE);
+        z = Mat_alloc(SIZE_COMPLEXE);
         #ifdef DEBUG_MALLOC
         if (z) debug("Memory allocation 'complexe_t': %zu Octets", SIZE_COMPLEXE);
         #endif
@@ -105,7 +110,7 @@ void complexe_one(void* z) {
     debug("Entering function!");
     #endif
     if (!z) {
-        z = malloc(SIZE_COMPLEXE);
+        z = Mat_alloc(SIZE_COMPLEXE);
         #ifdef DEBUG_MALLOC
         if (z) debug("Memory allocation 'complexe_t': %zu Octets", SIZE_COMPLEXE);
         #endif
@@ -124,7 +129,7 @@ void complexe_i(void* z) {
     debug("Entering function!");
     #endif
     if (!z) {
-        z = malloc(SIZE_COMPLEXE);
+        z = Mat_alloc(SIZE_COMPLEXE);
         #ifdef DEBUG_MALLOC
         if (z) debug("Memory allocation 'complexe_t': %zu Octets", SIZE_COMPLEXE);
         #endif
@@ -163,7 +168,7 @@ void complexe_add(const void* z1, const void* z2, void* res) {
     } else {
         union complexe a = *(const complexe_t)z1, b = *(const complexe_t)z2, tmp_res = *(complexe_t)res;
         if (!res) {
-            res = malloc(SIZE_COMPLEXE);
+            res = Mat_alloc(SIZE_COMPLEXE);
             #ifdef DEBUG_MALLOC
             if (res) debug("Memory allocation 'complexe_t': %zu Octets", SIZE_COMPLEXE);
             #endif
@@ -186,7 +191,7 @@ void complexe_sub(const void* z1, const void* z2, void* res) {
     } else {
         union complexe a = *(const complexe_t)z1, b = *(const complexe_t)z2, tmp_res = *(complexe_t)res;
         if (!res) {
-            res = malloc(SIZE_COMPLEXE);
+            res = Mat_alloc(SIZE_COMPLEXE);
             #ifdef DEBUG_MALLOC
             if (res) debug("Memory allocation 'complexe_t': %zu Octets", SIZE_COMPLEXE);
             #endif
@@ -209,7 +214,7 @@ void complexe_mult(const void* z1, const void* z2, void* res) { // z1 * z2 = (a1
     } else {
         union complexe a = *(const complexe_t)z1, b = *(const complexe_t)z2, tmp_res = *(complexe_t)res;
         if (!res) {
-            res = malloc(SIZE_COMPLEXE);
+            res = Mat_alloc(SIZE_COMPLEXE);
             #ifdef DEBUG_MALLOC
             if (res) debug("Memory allocation 'complexe_t': %zu Octets", SIZE_COMPLEXE);
             #endif
@@ -245,7 +250,7 @@ void complexe_div(const void* z1, const void* z2, void* res) { // z1 / z2 = ((a1
     } else {
         union complexe a = *(const complexe_t)z1, b = *(const complexe_t)z2, tmp_res = *(complexe_t)res;
         if (!res) {
-            res = malloc(SIZE_COMPLEXE);
+            res = Mat_alloc(SIZE_COMPLEXE);
             #ifdef DEBUG_MALLOC
             if (res) debug("Memory allocation 'complexe_t': %zu Octets", SIZE_COMPLEXE);
             #endif
@@ -319,8 +324,9 @@ void complexe_print(const void* x) {
     #endif
 }
 
-#ifdef DEBUGED
+#ifdef DEBUG
 int main(int argc, char const *argv[]) {
+    init_log();
     #if defined (__x86_64__)
         debug("64-bit architecture!\n");
     #elif defined (__i386__)
@@ -330,10 +336,10 @@ int main(int argc, char const *argv[]) {
     #endif
     complexe_t x1 = complexe_new(1.2, 2.1), x2 = complexe_new(2.8, 3.2);
     complexe_t add = complexe_new(0, 0), sub = complexe_new(0, 0), mult = complexe_new(0, 0), division = complexe_new(0, 0);
-    complexe_add((const void*)x1, (const void*)x2, (void*)add);
-    complexe_sub((const void*)x1, (const void*)x2, (void*)sub);
-    complexe_mult((const void*)x1, (const void*)x2, (void*)mult);
-    complexe_div((const void*)x1, (const void*)x2, (void*)division);
+    complexe_add(x1, x2, add);
+    complexe_sub(x1, x2, sub);
+    complexe_mult(x1, x2, mult);
+    complexe_div(x1, x2, division);
     complexe_print(x1); printf(" + "); complexe_print(x2); printf(" = "); complexe_print(add); printf("\n");
     complexe_print(x1); printf(" - "); complexe_print(x2); printf(" = "); complexe_print(sub); printf("\n");
     complexe_print(x1); printf(" * "); complexe_print(x2); printf(" = "); complexe_print(mult); printf("\n");

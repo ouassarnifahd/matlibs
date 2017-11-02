@@ -1,7 +1,7 @@
 #ifndef LISTE_H
 #define LISTE_H
 
-#include "common.h"
+#include <stdbool.h>
 
 typedef struct Node {
     void* pElement;
