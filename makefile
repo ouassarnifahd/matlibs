@@ -1,73 +1,72 @@
 #general
-CC    		:= gcc
-CLC			:= openclc
-RM			:= rm -rf
-MKDIR 		:= mkdir -p
-wFlags 		:= -Wall -O0
-Archs 		:= -arch x86_64
+CC    			:= gcc
+CLC					:= openclc
+RM					:= rm -rf
+MKDIR 			:= mkdir -p
+wFlags 			:= -Wall -O0
+Archs 			:= -arch x86_64
 Frameworks 	:= -framework OpenCL
-Libs		:= -lSDL
-GCCFlags	:= $(wFlags) $(Archs)
+Libs				:= -lSDL
+GCCFlags		:= $(wFlags) $(Archs)
 srcPath	    := src
-clPath		:= cl
-incPath		:= inc
-objPath		:= obj
-binPath		:= bin
-debugPath	:= debug
-Project		:= matlib
+clPath			:= cl
+incPath			:= inc
+objPath			:= obj
+binPath			:= bin
+debugPath		:= debug
+Project			:= matlib
 
 #Debug
-dbgFlags	:= $(GCCFlags) -g -D DEBUG
+dbgFlags		:= $(GCCFlags) -g -D DEBUG
 
-ifeq ($(dbg_verbose), yes)
-dbgFlags	+= -D DEBUG_CONTEXT
-dbgFlags	+= -D DEBUG_MALLOC
-dbgFlags	+= -D DEBUG_FREE
-endif
+# dbg_verbose options: alloc, op&data, context, memory, all
 
 ifeq ($(dbg_verbose), alloc)
-dbgFlags	+= -D DEBUG_MALLOC
-dbgFlags	+= -D DEBUG_FREE
+dbgFlags		+= -D DEBUG_MALLOC
+dbgFlags		+= -D DEBUG_FREE
+dbgFlags		+= -D DEBUG_CONTEXT
 endif
 
 ifeq ($(dbg_verbose), op&data)
-dbgFlags	+= -D DEBUG_INIT
-dbgFlags	+= -D DEBUG_OPERATION
+dbgFlags		+= -D DEBUG_INIT
+dbgFlags		+= -D DEBUG_OPERATION
+dbgFlags		+= -D DEBUG_CONTEXT
 endif
 
 ifeq ($(dbg_verbose), context)
-dbgFlags	+= -D DEBUG_CONTEXT
+dbgFlags		+= -D DEBUG_CONTEXT
 endif
 
 ifeq ($(dbg_verbose), memory)
-dbgFlags	+= -D DEBUG_MEMORY
+dbgFlags		+= -D DEBUG_MEMORY
+dbgFlags		+= -D DEBUG_CONTEXT
 endif
 
 ifeq ($(dbg_verbose), all)
-dbgFlags	+= -D DEBUG_CONTEXT
-dbgFlags	+= -D DEBUG_MEMORY
-dbgFlags	+= -D DEBUG_MALLOC
-dbgFlags	+= -D DEBUG_FREE
-dbgFlags	+= -D DEBUG_INIT
-dbgFlags	+= -D DEBUG_OPERATION
-dbgFlags	+= -D DEBUG_PRINT
+dbgFlags		+= -D DEBUG_CONTEXT
+dbgFlags		+= -D DEBUG_MEMORY
+dbgFlags		+= -D DEBUG_MALLOC
+dbgFlags		+= -D DEBUG_FREE
+dbgFlags		+= -D DEBUG_INIT
+dbgFlags		+= -D DEBUG_OPERATION
+dbgFlags		+= -D DEBUG_PRINT
 endif
 
 #Colors
-RED			:= \033[0;31m
-GREEN		:= \033[0;32m
-BLUE		:= \033[0;34m
-PURPLE		:= \033[0;35m
-NOCOLOR		:= \033[0m
+RED					:= \033[0;31m
+GREEN				:= \033[0;32m
+BLUE				:= \033[0;34m
+PURPLE			:= \033[0;35m
+NOCOLOR			:= \033[0m
 
 #common
 rec_wildcard = $(foreach dir, $(wildcard $1*), $(call rec_wildcard, $dir/, $2) $(filter $(subst *,%,$2), $dir))
 
-inc 		:= $(call rec_wildcard $(incPath)/, *.h)
-src  		:= $(call rec_wildcard $(srcPath)/, *.c)
-kernels		:= $(call rec_wildcard $(clPath)/, *.cl)
+inc 				:= $(call rec_wildcard $(incPath)/, *.h)
+src  				:= $(call rec_wildcard $(srcPath)/, *.c)
+kernels			:= $(call rec_wildcard $(clPath)/, *.cl)
 
-obj  		:= $(src:$(srcPath)/%c=%o)
+obj  				:= $(src:$(srcPath)/%c=%o)
 
 # all: mrproper build
 

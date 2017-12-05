@@ -1,26 +1,37 @@
 #include "common.h"
-#include "data/liste.h"
+#include "data/mlist.h"
+#include "data/type.h"
 
 #define Kio (1ull << 10)
 #define Mio (1ull << 20)
 #define Gio (1ull << 30)
 
-#define MAX_MEMORY 10 * Mio
+#define PAGE_SIZE 4 * Kio
 
-typedef struct partition {
-    void* start;
-    void* data;
-    void* end;
-} partition_t;
+#define MAX_MEMORY 8 * PAGE_SIZE
 
-static struct List alloc_segment = {
-    0, sizeof(struct partition),
-    NULL, NULL, NULL, -1
+static struct memList alloc_segment[Mat_Types + 1] = {
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 }
 };
 
-static struct List free_segment = {
-    0, sizeof(struct partition),
-    NULL, NULL, NULL, -1
+static struct memList free_segment[Mat_Types + 1] = {
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 },
+    { 0, NULL, NULL, NULL, -1 }
 };
 
 typedef struct memory {
@@ -29,32 +40,43 @@ typedef struct memory {
     size_t used_global;
     size_t free_global;
     size_t lost_global;
-    PTList used;
-    PTPile freed;
+    memoryList_t used;
+    memoryPile_t freed;
 } *memory_t;
 
-static struct memory global_memory = {
-    NULL, 0, 0, 0, 0, &alloc_segment, &free_segment
+static struct memory global_memory[Mat_Types + 1] = {
+    { NULL, 0, 0, 0, 0, &alloc_segment[Real],       &free_segment[Real]      },
+    { NULL, 0, 0, 0, 0, &alloc_segment[Complexe],   &free_segment[Complexe]  },
+    { NULL, 0, 0, 0, 0, &alloc_segment[RVector],    &free_segment[RVector]   },
+    { NULL, 0, 0, 0, 0, &alloc_segment[CVector],    &free_segment[CVector]   },
+    { NULL, 0, 0, 0, 0, &alloc_segment[RMatrix],    &free_segment[RMatrix]   },
+    { NULL, 0, 0, 0, 0, &alloc_segment[CMatrix],    &free_segment[CMatrix]   },
+    { NULL, 0, 0, 0, 0, &alloc_segment[RTensor],    &free_segment[RTensor]   },
+    { NULL, 0, 0, 0, 0, &alloc_segment[CTensor],    &free_segment[CTensor]   },
+    { NULL, 0, 0, 0, 0, &alloc_segment[Mat_Types],  &free_segment[Mat_Types] }
 };
 
-static size_t get_partition_size(const partition_t *chunk) {
-    #ifdef DEBUG_INLINE
-    debug("Inline function!\n");
-    #endif
-    return (size_t)chunk->end - (size_t)chunk->start;
+#ifdef DEBUG_MEMORY
+static void memory_display(const memory_t global) {
+    debug("MEMORY STATE!");
+    if (global->start_global) {
+        debug("Start MEMORY: %zu", (size_t)global->start_global);
+        debug("Size  MEMORY: %zu Octets", global->size_global);
+        debug("used  MEMORY: %zu Octets", global->used_global);
+        debug("free  MEMORY: %zu Octets", global->free_global);
+        debug("lost  MEMORY: %zu Octets", global->lost_global);
+        debug("USED Partitions:");
+        memoryList_Display(global->used);
+        debug("FREED Partitions:");
+        memoryList_Display(global->freed);
+    } else {
+        debug("Memory was freed!");
+    }
 }
+#endif
 
-static bool partition_can_merge(partition_t chunk1, partition_t chunk2) {
-    return 0;
-}
-
-static partition_t partition_merge(partition_t chunk1, partition_t chunk2) {
-    return chunk1;
-}
-
-static bool partitions_equal(const void *chunk1, const void *chunk2) {
-    partition_t part1 = *(const partition_t *)chunk1, part2 = *(const partition_t *)chunk2;
-    return !(part1.data - part2.data);
+static bool partitions_equal(const void *data1, const void *data2) {
+    return !(data1 - data2);
 }
 
 static void memory_get(const memory_t global, size_t size_global) {
@@ -62,13 +84,18 @@ static void memory_get(const memory_t global, size_t size_global) {
     debug("Entering function!");
     #endif
     if (size_global < MAX_MEMORY) {
+        #ifdef DEBUG_MEMORY
+        debug("SYSCALL malloc: %zu Octets", size_global);
+        #endif
         global->start_global = malloc(size_global);
         alloc_check(global->start_global);
         #ifdef DEBUG_MEMORY
-        debug("Memory allocation 'void *': %zu Octets", size_global);
+        debug("Memory allocation Successed: %zu Octets", size_global);
         #endif
         global->size_global = size_global;
+        global->used_global = 0;
         global->free_global = size_global;
+        global->lost_global = 0;
     } else {
         error("Reached memory limits!");
     }
@@ -82,10 +109,13 @@ static void memory_resize(const memory_t global, size_t size_global) {
     debug("Entering function!");
     #endif
     if (size_global < MAX_MEMORY) {
+        #ifdef DEBUG_MEMORY
+        debug("SYSCALL realloc: %zu Octets", size_global);
+        #endif
         global->start_global = realloc(global->start_global, size_global);
         alloc_check(global->start_global);
         #ifdef DEBUG_MEMORY
-        debug("Memory reallocation 'void *': %zu Octets", size_global);
+        debug("Memory reallocation Successed: %zu Octets", size_global);
         #endif
         global->free_global += size_global - global->size_global;
         global->size_global = size_global;
@@ -101,20 +131,23 @@ static void memory_let(const memory_t global) {
     #ifdef DEBUG_MEMORY
     debug("Entering function!");
     #endif
-    if (!TList_IsEmpty(global->used)) {
+    if (!memoryList_IsEmpty(global->used)) {
         warning("Memory Freed Data loss!");
     }
     free(global->start_global);
+    global->start_global = NULL;
+    global->size_global = 0;
+    global->used_global = 0;
+    global->free_global = 0;
+    global->lost_global = 0;
+    memoryList_ClearPartitions(global->used);
+    memoryList_ClearPartitions(global->freed);
     #ifdef DEBUG_MEMORY
     debug("leaving function!\n");
     #endif
 }
 
-static void memory_defrag(const memory_t global) {
-    return ;
-}
-
-static void* get_current_top_memory(const memory_t global) {
+static void* memory_GetTop(const memory_t global) {
     #ifdef DEBUG_INLINE
     debug("Inline function!\n");
     #endif
@@ -126,82 +159,91 @@ static void* memory_alloc(const memory_t global, size_t size) {
     debug("Entering function!");
     #endif
     if (!global->start_global) {
-        memory_get(global, Kio);
+        memory_get(global, PAGE_SIZE);
     } else if (global->free_global < size) {
-        memory_resize(global, global->size_global + Kio);
+        memory_resize(global, global->size_global + PAGE_SIZE);
     }
-    partition_t *chunk = (partition_t *)((char *)global->start_global + global->used_global);
-    chunk->start = (char *)global->start_global + global->used_global;
-    chunk->data = (char *)global->start_global + global->used_global + sizeof(partition_t) + sizeof(TNode);
-    chunk->end = (char *)chunk->start + size + sizeof(partition_t) + sizeof(TNode);
+    memoryNode_t chunk = (memoryNode_t)memory_GetTop(global);
+    chunk->data = memory_GetTop(global) + sizeof(struct memNode);
+    chunk->size = size;
+    chunk->Next = NULL;
     #ifdef DEBUG_MEMORY
     debug("Memory chunk allocated: size %zu Octets", size);
     #endif
-    global->used_global += sizeof(partition_t) + sizeof(TNode);
-    global->free_global -= sizeof(partition_t) + sizeof(TNode);
-    PTNode newChunk = (PTNode)((char *)chunk->start + sizeof(partition_t));
-    newChunk->pElement = chunk;
-    newChunk->Next = NULL;
-    TList_AddNode(global->used, newChunk);
-    global->used_global += size;
-    global->free_global -= size;
+    global->used_global += memoryNode_GetSize(chunk);
+    global->free_global -= memoryNode_GetSize(chunk);
+    memoryList_AddPartition(global->used, chunk);
     #ifdef DEBUG_MEMORY
+    memory_display(global);
     debug("leaving function!\n");
     #endif
-    return (void *)chunk->data;
+    return chunk->data;
 }
 
 void* Mat_alloc(size_t size) {
-    return memory_alloc(&global_memory, size);
+    return memory_alloc(&global_memory[Mat_Types], size);
 }
 
 static void memory_free(const memory_t global, void* pointer) {
     #ifdef DEBUG_MEMORY
     debug("Entering function!");
     #endif
-    partition_t tmp = {NULL, NULL, NULL}; tmp.data = pointer;
-    PTNode toFree = TList_Find(global->used, &tmp, partitions_equal);
-    if(!TList_RemoveCurrentNode(global->used)) {
+    memoryNode_t toFree = memoryList_Find(global->used, pointer, partitions_equal);
+    if(!memoryList_RemoveCurrentPartition(global->used)) {
         error("Memory error!");
     }
-    TPile_PUSHNode(global->freed, toFree);
-    size_t lost = get_partition_size((const partition_t *)toFree);
+    memoryPile_PUSH_Partition(global->freed, toFree);
+    size_t lost = memoryNode_GetSize(toFree);
+    #ifdef DEBUG_MEMORY
+    debug("lost memory: %zu", lost);
+    #endif
+    global->used_global -= lost;
     global->lost_global += lost;
-    global->free_global -= lost;
-    if (TList_IsEmpty(global->used)) {
+    if (memoryList_IsEmpty(global->used)) {
         memory_let(global);
     }
     pointer = NULL;
     #ifdef DEBUG_MEMORY
+    memory_display(global);
     debug("leaving function!\n");
     #endif
 }
 
 void Mat_free(void* pointer) {
-    memory_free(&global_memory, pointer);
+    memory_free(&global_memory[Mat_Types], pointer);
 }
 
 static void* memory_realloc(const memory_t global, void* pointer, size_t size) {
     #ifdef DEBUG_MEMORY
     debug("Entering function!");
     #endif
-    memory_free(global, pointer);
-    PTNode toRealloc = TPile_POPNode(global->freed);
-    size_t allocated = get_partition_size(toRealloc->pElement);
-    void* newPointer = memory_alloc(global, size);
-    void* oldPointer = ((partition_t *)toRealloc->pElement)->data;
-    memcpy(newPointer, oldPointer, allocated - sizeof(partition_t) - sizeof(TNode));
+    void* newPointer = NULL;
+    memoryNode_t toFree = memoryList_Find(global->used, pointer, partitions_equal);
+    if (toFree->size > size) {
+        newPointer = pointer;
+        global->lost_global += memoryNode_GetSize(toFree) - size;
+        toFree->size = size;
+    } else if (toFree->size == size) {
+        newPointer = pointer;
+    } else {
+        memory_free(global, pointer);
+        memoryNode_t toRealloc = memoryPile_POP_Partition(global->freed);
+        void* newPointer = memory_alloc(global, size);
+        void* oldPointer = toRealloc->data;
+        memcpy(newPointer, oldPointer, toRealloc->size);
+    }
     #ifdef DEBUG_MEMORY
+    memory_display(global);
     debug("leaving function!\n");
     #endif
     return newPointer;
 }
 
 void* Mat_realloc(void* pointer, size_t size) {
-    return memory_realloc(&global_memory, pointer, size);
+    return memory_realloc(&global_memory[Mat_Types], pointer, size);
 }
 
-#ifdef DEBUGED
+#ifdef DEBUGING
 int main(int argc, char const *argv[]) {
     init_log();
     #if defined (__x86_64__)
@@ -211,18 +253,16 @@ int main(int argc, char const *argv[]) {
     #else
         error("Incompatible architecture!");
     #endif
-    memory_get(&global_memory, Kio);
-    int* integer = memory_alloc(&global_memory, sizeof(int));
+    int* integer = Mat_alloc(sizeof(int));
     *integer = 123;
     printf("%d\n", *integer);
-    char* str = memory_alloc(&global_memory, 12);
+    char* str = Mat_alloc(sizeof(char) * 12);
     strcpy(str, "Hello World!");
     printf("%s\n", str);
-    memory_free(&global_memory, integer);
-    str = memory_realloc(&global_memory, str, 12);
+    Mat_free(integer);
+    // str = Mat_realloc(str, 14); // Pffff!!
     printf("%s\n", str);
-    memory_free(&global_memory, str);
-    memory_let(&global_memory);
+    Mat_free(str);
     debug("FY!");
     return 0;
 }

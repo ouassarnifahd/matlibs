@@ -2,22 +2,7 @@
 #define REAL_H
 
 #include <stdbool.h>
-
-#ifdef __x86_64__
-
-#define SIZE_REAL sizeof(double)
-#define PRINT_REAL "%7.2lf"
-
-typedef double* real_t;
-
-#elif __i386__
-
-#define SIZE_REAL sizeof(float)
-#define PRINT_REAL "%5.2f"
-
-typedef float* real_t;
-
-#endif
+#include "data/type.h"
 
 void* real_new(double x);
 

@@ -171,7 +171,7 @@ void real_add(const void* x1, const void* x2, void* res) {
         }
         #ifdef DEBUG_OPERATION
         #ifdef __x86_64__
-        double a = *pa, b = *pb, x = *(real_t)res;
+        double a = *pa, b = *pb;
         #else
         float a = *pa, b = *pb;
         #endif
@@ -201,7 +201,7 @@ void real_sub(const void* x1, const void* x2, void* res) {
         }
         #ifdef DEBUG_OPERATION
         #ifdef __x86_64__
-        double a = *pa, b = *pb, x = *(real_t)res;
+        double a = *pa, b = *pb;
         #else
         float a = *pa, b = *pb;
         #endif
@@ -231,7 +231,7 @@ void real_mult(const void* x1, const void* x2, void* res) {
         }
         #ifdef DEBUG_OPERATION
         #ifdef __x86_64__
-        double a = *pa, b = *pb, x = *(real_t)res;
+        double a = *pa, b = *pb;
         #else
         float a = *pa, b = *pb;
         #endif
@@ -266,7 +266,7 @@ void real_div(const void* x1, const void* x2, void* res) {
         }
         #ifdef DEBUG_OPERATION
         #ifdef __x86_64__
-        double a = *pa, b = *pb, x = *(real_t)res;
+        double a = *pa, b = *pb;
         #else
         float a = *pa, b = *pb;
         #endif
@@ -295,7 +295,7 @@ void real_print(const void* x) {
     #endif
 }
 
-#ifdef DEBUGED
+#ifdef DEBUG
 int main(int argc, char const *argv[]) {
     #if defined (__x86_64__)
         debug("64-bit architecture!\n");

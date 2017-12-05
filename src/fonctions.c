@@ -50,9 +50,9 @@ polynome_t taylor_fonction(fcomplexe_t fx, size_t ordre, complexe_t a) {
 
 // fonctions
 
-// fcomplexe fcomplexe_o(fcomplexe gx, fcomplexe fx) {
-//     return (*gx)(fx);
-// }
+fcomplexe_t fcomplexe_o(fcomplexe_t gx, fcomplexe_t fx) {
+    return (*gx)(fx);
+}
 
 // fcomplexe fcomplexe_differentiate(fcomplexe fx) {
 //     switch (fx) {

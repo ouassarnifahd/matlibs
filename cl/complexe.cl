@@ -12,6 +12,6 @@ static local double2 complexe_div(local double2 z1, local double2 z2) {
     return res_div;
 }
 
-kernel void complexe_pow(global double2* z, size_t power, global double2 zpower) {
-    
+kernel void complexe_pow(global double2* z, size_t power, global double2* zpower) {
+    *zpower = 
 }

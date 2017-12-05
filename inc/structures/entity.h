@@ -2,6 +2,7 @@
 #define ENTITY_H
 
 #include "common.h"
+#include "data/type.h"
 
 typedef void* (*math_new_t) (void);
 
@@ -16,7 +17,7 @@ typedef void (*math_accumulator_t) (const void *, math_methode_t, math_operation
 typedef void (*math_print_t) (const void *);
 
 typedef struct math {
-    size_t size_element;
+    dataType_t type;
     math_new_t new;
     math_methode_t delete, zero, one, inv;
     math_test_t is_null, is_positive, is_negative;
@@ -25,7 +26,7 @@ typedef struct math {
     math_print_t print;
 } *math_entity_t;
 
-math_entity_t entity_new(size_t size_element);
+math_entity_t entity_new(dataType_t type);
 
 void entity_delete(math_entity_t ent);
 

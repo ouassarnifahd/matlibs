@@ -17,8 +17,6 @@ typedef union complexe {
     } exp;
 } *complexe_t;
 
-#define SIZE_COMPLEXE sizeof(union complexe)
-
 void* complexe_new(double real, double imaginary);
 
 void complexe_delete(void* z);
