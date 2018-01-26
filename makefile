@@ -5,61 +5,65 @@ RM			:= rm -rf
 MKDIR 		:= mkdir -p
 MAKE		:= make
 
-#Flags
-wFlags 		:= -Wall -O0
-Archs 		:= -arch x86_64
-Frameworks 	:= -framework OpenCL
-Libs		:= -lSDL
-CFlags		:= $(wFlags) $(Archs)
-
 #Paths
 srcPath		:= src
 clPath		:= cl
+libPath		:= lib
 incPath		:= inc
 objPath		:= obj
 binPath		:= bin
 
+#Flags
+wFlags 		:= -Wall -O0
+Archs 		:= -arch x86_64
+Frameworks 	:= -framework OpenCL -framework OpenGL
+Libs		:= -I$(libPath)
+CFlags		:= $(wFlags) $(Archs) $(Libs)
+LFlags 		:= $(Frameworks) -lglfw -lglew
+
 #Project Name
 Project		:= matlib
-buildFlags  := -D BUILD
+buildName	?=
+buildPath	:= $(srcPath)/$(buildName)
+buildPath	:= $(buildPath:%/=%)
+buildFlags  := -D __BUILD__
 
 #Debug
-dbgFlags	:= -g -D DEBUG
+dbgFlags	:= -g -D __DEBUG__
 debugPath	:= debug
+verbose		?= context
 
-# dbg_verbose options: alloc, op&data, context, memory, all
-ifeq ($(dbg_verbose), alloc)
-dbgFlags += -D DEBUG_MALLOC
-dbgFlags += -D DEBUG_FREE
-dbgFlags += -D DEBUG_CONTEXT
-dbgFlags += -D DEBUG_INLINE
+#verbose options: alloc, op&data, context, memory, print, graphics, all
+ifeq ($(verbose), all)
+  verbose += alloc op&data context memory print graphics
 endif
 
-ifeq ($(dbg_verbose), op&data)
-dbgFlags += -D DEBUG_INIT
-dbgFlags += -D DEBUG_OPERATION
-dbgFlags += -D DEBUG_CONTEXT
-dbgFlags += -D DEBUG_INLINE
+ifneq (,$(findstring alloc , $(verbose)))
+  dbgFlags += -D __DEBUG__MALLOC__
+  dbgFlags += -D __DEBUG__FREE__
 endif
 
-ifeq ($(dbg_verbose), context)
-dbgFlags += -D DEBUG_CONTEXT
-dbgFlags += -D DEBUG_INLINE
+ifneq (,$(findstring context , $(verbose)))
+  dbgFlags += -D __DEBUG__CONTEXT__
+  dbgFlags += -D __DEBUG__INLINE__
 endif
 
-ifeq ($(dbg_verbose), memory)
-dbgFlags += -D DEBUG_MEMORY
+ifneq (,$(findstring op&data , $(verbose)))
+  dbgFlags += -D __DEBUG__INIT__
+  dbgFlags += -D __DEBUG__OPERATION__
 endif
 
-ifeq ($(dbg_verbose), all)
-dbgFlags += -D DEBUG_CONTEXT
-dbgFlags += -D DEBUG_INLINE
-dbgFlags += -D DEBUG_MEMORY
-dbgFlags += -D DEBUG_MALLOC
-dbgFlags += -D DEBUG_FREE
-dbgFlags += -D DEBUG_INIT
-dbgFlags += -D DEBUG_OPERATION
-dbgFlags += -D DEBUG_PRINT
+ifneq (,$(findstring memory , $(verbose)))
+  dbgFlags += -D __DEBUG__MEMORY__
+endif
+
+ifeq ($(verbose), graphics)
+  dbgFlags += -D __DEBUG__OpenGL__
+  dbgFlags += -D __DEBUG__GCONTEXT__
+endif
+
+ifneq (,$(findstring print , $(verbose)))
+  dbgFlags += -D __DEBUG__PRINT__
 endif
 
 #Colors
@@ -83,13 +87,13 @@ NOCOLOR := \033[0m
 
 #common
 inc 	:= $(shell find $(incPath) -name '*.h')
-src  	:= $(shell find $(srcPath) -name '*.c')
+src  	:= $(shell find $(buildPath) -name '*.c')
 kernels	:= $(shell find $(clPath) -name '*.cl')
 
 obj		:= $(src:$(srcPath)/%c=$(objPath)/%o)
 dobj	:= $(src:$(srcPath)/%c=$(debugPath)/%o)
 
-all: mrproper dbuild build
+all: mrproper dbg$(Project) $(Project)
 
 help:
 	@echo "the project is in developement"
@@ -97,23 +101,22 @@ help:
 	@echo "NB: srcfile.c should have a main function in the DEBUG macro space"
 	@echo "ie: ./$(debugPath)/structures/vectors.dbg objects=\"structures/real.o structures/complexe.o structures/entity.o\""
 
-build: $(obj)
+$(Project): $(obj)
 	@$(MAKE) directory path=$(binPath)/Release
-	@$(MAKE) compile OBJ='no' Flags="$(CFlags) $(buildFlags)" out=$(binPath)/Release/$(Project) objects="$^"
+	@$(MAKE) compile OBJ='no' Flags="$(buildFlags)" out=$(binPath)/Release/$(Project) objects="$^"
 
-dbuild: $(dobj)
+dbg$(Project): $(dobj)
 	@$(MAKE) directory path=$(binPath)/Debug
-	@$(MAKE) compile OBJ='no' Flags="$(CFlags) $(buildFlags) $(dbgFlags)" out=$(binPath)/Debug/$(Project) objects="$^"
-
+	@$(MAKE) compile OBJ='no' Flags="$(buildFlags) $(dbgFlags)" out=$(binPath)/Debug/$(Project) objects="$^"
 
 $(objPath)/%.o: $(srcPath)/%.c
 	@$(MAKE) directory path=$(dir $@)
-	@$(MAKE) compile OBJ='yes' Flags="$(CFlags) $(buildFlags)" out=$@ in=$<
+	@$(MAKE) compile OBJ='yes' Flags="$(buildFlags)" out=$@ in=$<
 
 #debug
 $(debugPath)/%.o: $(srcPath)/%.c
 	@$(MAKE) directory path=$(dir $@)
-	@$(MAKE) compile OBJ='yes' Flags="$(CFlags) $(dbgFlags)" out=$@ in=$< 2> $(basename $@).err
+	@$(MAKE) compile OBJ='yes' Flags="$(dbgFlags)" out=$@ in=$< 2> $(basename $@).err
 
 
 directory:
@@ -122,10 +125,10 @@ directory:
 compile:
 	@if [ $(OBJ) = 'yes' ]; then \
 		echo "$(LRED)Generating $(LPURPLE)Object $(LRED)file:$(GREEN) $(out)$(NOCOLOR)"; \
-		$(CC) -I $(incPath) $(Flags) -c -o $(out) $(in); \
+		$(CC) -I $(incPath) $(CFlags) $(Flags) -c -o $(out) $(in); \
 	else \
 		echo "$(LRED)Generating $(LPURPLE)Binary $(LRED)file:$(GREEN) $(out)$(NOCOLOR)"; \
-		$(CC) -I $(incPath) $(Flags) -o $(out) $(objects); \
+		$(CC) -I $(incPath) $(LFlags) $(CFlags) $(Flags) -o $(out) $(objects); \
 	fi
 
 mrproper:

@@ -4,7 +4,7 @@
 typedef struct memNode {
     void* data;
     size_t size;
-    #ifdef DEBUG
+    #ifdef __DEBUG__
     unsigned char id;
     #endif
     struct memNode *Next;
@@ -20,7 +20,7 @@ typedef struct memList {
     ssize_t       Index;
 } *memoryList_t;
 
-#ifdef DEBUG
+#ifdef __DEBUG__
 unsigned char memoryNode_NewId();
 #endif
 
@@ -50,7 +50,7 @@ bool memoryList_RemoveCurrentPartition(const memoryList_t mList);
 
 void memoryList_ClearPartitions(const memoryList_t mList);
 
-#ifdef DEBUG
+#ifdef __DEBUG__
 void memoryList_Display(const memoryList_t mList);
 #endif
 

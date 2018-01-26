@@ -3,12 +3,13 @@
 
 #include <stdbool.h>     // bool defs
 
-#define Mat_PI  3.1415926536
+#define Mat_PI  3.14159265358979323846264338327f
 #define Mat_exp 2.7182818285
 
-#define Mat_max(x,y) x >= y ? x : y
-#define Mat_min(x,y) x <= y ? x : y
-#define Mat_signe(x) x < 0
+#define Mat_max(x,y) (x >= y ? x : y)
+#define Mat_min(x,y) (x <= y ? x : y)
+#define Mat_clamp(a,mn,mx) (a < mn ? mn : (a > mx ? mx : a))
+#define Mat_signe(x) (x < 0)
 #define Mat_abs(x) Mat_max(x,-x)
 
 /*

@@ -18,7 +18,7 @@ void* Mat_realloc(void* pointer, size_t size);
 
 void Mat_free(void* pointer);
 
-#ifdef DEBUG
+#ifdef __DEBUG__
 void memory_Debug();
 #endif
 

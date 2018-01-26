@@ -1,20 +1,15 @@
 # Simple math implementations with C
 
-## I. Numbers (v0.0.1 - stable)
-* Real
-* Complexe
+## I. Core Nearly Finished
+* Real, Complexe, Real&Complexe Vectors and matrixes.
+* Complexe polynomes.
+* Complexe fractions (work in progress)
+* Tensors (work in progress)
 
-## II. Vectors (v0.0.2 - unstable)
-* entity — description of math structures so we can create
-  * Polynomes (i.e. vectors)
-  * Matrix (i.e vectors columns & lines)
-  * Fractions (i.e 2 vectors)
+## II. Some useful implementations (work in progress)
+* Automatics basics
+* Machine Learning basics
+* Signal Processing basics
 
-## III.Functions (work in progress)
-* differentials
-* Newton search algorithm
-
-
-##### What's new!
-* Making use of void* to adapt with all the structures.
-* Introducing math entities
+## III. User Interface (work in progress)
+* 2Dplot using OpenGL.

@@ -3,7 +3,7 @@
 
 #define BUFFER_SIZE 128
 
-#ifdef DEBUG
+#ifdef __DEBUG__
   #include <time.h>
 
   #define LOGFILE_PATH "./debug/logfile.mlb"
@@ -16,7 +16,7 @@ char out_str[BUFFER_SIZE];
 
 #define init_log()
 
-#ifdef DEBUG
+#ifdef __DEBUG__
   static FILE* logfile = NULL;
 
   #define ctime_date(str_TIME, str) { \
@@ -75,7 +75,7 @@ char out_str[BUFFER_SIZE];
 
 #define alloc_check(PTR) { if((PTR) == NULL) { error("Out of Memory!"); } }
 
-#ifdef DEBUG
+#ifdef __DEBUG__
     #undef error
     #define error(MSG, ...) {\
         sprintf(out_str, "\033[0;31m[ERROR]\033[0m (%s:%s:%i) ", __FILE__, __func__, __LINE__); \

@@ -13,7 +13,8 @@ char* builtin_commands[] = {
     "exit"
 };
 
-// Hey you whats this! :p ==> void* (*f) (void* , void (*g)(void*));
+// Hey you whats this! :p ==>
+// void* (*f[]) (void* , void (*g)(void*));
 
 int (*builtin_functions[]) (char **) = {
     &Mat_help,
