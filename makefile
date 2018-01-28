@@ -3,108 +3,141 @@ CC    		:= gcc
 CLC			:= openclc
 RM			:= rm -rf
 MKDIR 		:= mkdir -p
-wFlags 		:= -Wall -O0
-Archs 		:= -arch x86_64
-Frameworks 	:= -framework OpenCL
-srcPath	    := src
+MAKE		:= make
+
+#Paths
+srcPath		:= src
 clPath		:= cl
+libPath		:= lib
 incPath		:= inc
 objPath		:= obj
 binPath		:= bin
-debugPath	:= debug
+
+#Flags
+wFlags 		:= -Wall -O0
+Archs 		:= -arch x86_64
+Frameworks 	:= -framework OpenCL -framework OpenGL
+Libs		:= -I$(libPath)
+CFlags		:= $(wFlags) $(Archs) $(Libs)
+LFlags 		:= $(Frameworks) -lglfw -lglew
+
+#Project Name
 Project		:= matlib
+buildName	?=
+buildPath	:= $(srcPath)/$(buildName)
+buildPath	:= $(buildPath:%/=%)
+buildFlags  := -D __BUILD__
 
 #Debug
-dbgFlags	:= $(wFlag) -g -D DEBUG
+dbgFlags	:= -g -D __DEBUG__
+debugPath	:= debug
+verbose		?= context
 
-ifeq ($(dbg_verbose), yes)
-dbgFlags	+= -D DEBUG_CONTEXT
-dbgFlags	+= -D DEBUG_MALLOC
-dbgFlags	+= -D DEBUG_FREE
+#verbose options: alloc, op&data, context, memory, print, graphics, all
+ifeq ($(verbose), all)
+  verbose += alloc op&data context memory print graphics
 endif
 
-ifeq ($(dbg_verbose), alloc)
-dbgFlags	+= -D DEBUG_MALLOC
-dbgFlags	+= -D DEBUG_FREE
+ifneq (,$(findstring alloc , $(verbose)))
+  dbgFlags += -D __DEBUG__MALLOC__
+  dbgFlags += -D __DEBUG__FREE__
 endif
 
-ifeq ($(dbg_verbose), op&data)
-dbgFlags	+= -D DEBUG_INIT
-dbgFlags	+= -D DEBUG_OPERATION
+ifneq (,$(findstring context , $(verbose)))
+  dbgFlags += -D __DEBUG__CONTEXT__
+  dbgFlags += -D __DEBUG__INLINE__
 endif
 
-ifeq ($(dbg_verbose), context)
-dbgFlags	+= -D DEBUG_CONTEXT
+ifneq (,$(findstring op&data , $(verbose)))
+  dbgFlags += -D __DEBUG__INIT__
+  dbgFlags += -D __DEBUG__OPERATION__
 endif
 
-ifeq ($(dbg_verbose), all)
-dbgFlags	+= -D DEBUG_CONTEXT
-dbgFlags	+= -D DEBUG_MALLOC
-dbgFlags	+= -D DEBUG_FREE
-dbgFlags	+= -D DEBUG_INIT
-dbgFlags	+= -D DEBUG_OPERATION
-dbgFlags	+= -D DEBUG_PRINT
+ifneq (,$(findstring memory , $(verbose)))
+  dbgFlags += -D __DEBUG__MEMORY__
+endif
+
+ifeq ($(verbose), graphics)
+  dbgFlags += -D __DEBUG__OpenGL__
+  dbgFlags += -D __DEBUG__GCONTEXT__
+endif
+
+ifneq (,$(findstring print , $(verbose)))
+  dbgFlags += -D __DEBUG__PRINT__
 endif
 
 #Colors
-RED			:= \033[0;31m
-GREEN		:= \033[0;32m
-BLUE		:= \033[0;34m
-PURPLE		:= \033[0;35m
-NOCOLOR		:= \033[0m
+BLACK	:= \033[0;30m
+GRAY	:= \033[1;30m
+RED		:= \033[0;31m
+LRED	:= \033[1;31m
+GREEN	:= \033[0;32m
+LGREEN	:= \033[1;32m
+BROWN	:= \033[0;33m
+YELLOW	:= \033[1;33m
+BLUE	:= \033[0;34m
+LBLUE	:= \033[1;34m
+PURPLE	:= \033[0;35m
+LPURPLE	:= \033[1;35m
+CYAN	:= \033[0;36m
+LCYAN	:= \033[1;36m
+LGRAY	:= \033[0;37m
+WHITE	:= \033[1;37m
+NOCOLOR := \033[0m
 
 #common
-rec_wildcard = $(foreach dir, $(wildcard $1*), $(call rec_wildcard, $dir/, $2) $(filter $(subst *,%,$2), $dir))
+inc 	:= $(shell find $(incPath) -name '*.h')
+src  	:= $(shell find $(buildPath) -name '*.c')
+kernels	:= $(shell find $(clPath) -name '*.cl')
 
-inc 		:= $(call rec_wildcard $(incPath)/, *.h)
-src  		:= $(call rec_wildcard $(srcPath)/, *.c)
-kernels		:= $(call rec_wildcard $(clPath)/, *.cl)
+obj		:= $(src:$(srcPath)/%c=$(objPath)/%o)
+dobj	:= $(src:$(srcPath)/%c=$(debugPath)/%o)
 
-obj  		:= $(src:$(srcPath)/%c=%o)
-
-# all: mrproper build
+all: mrproper dbg$(Project) $(Project)
 
 help:
 	@echo "the project is in developement"
-	@echo "make ./$(debugPath)/srcfile.dbg objects=\"object.o files.o dependencies.o if_there_is_any.o\""
+	@echo "usage: make ./$(debugPath)/srcfile.dbg objects=\"object.o files.o dependencies.o if_there_is_any.o\""
 	@echo "NB: srcfile.c should have a main function in the DEBUG macro space"
 	@echo "ie: ./$(debugPath)/structures/vectors.dbg objects=\"structures/real.o structures/complexe.o structures/entity.o\""
 
-$(debugPath)/%.dbg: $(srcPath)/%.c $(inc)
-	@$(MAKE) directory path=$(dir $@)
-	@if [ '$(objects)' != '' ]; then \
-		$(MAKE) $(addprefix $(debugPath)/,$(objects)) Flags="$(Flags)"; \
-		$(MAKE) compile OBJ='no' CFlags="$(dbgFlags) $(Flags)" out=$@ objects="$(addprefix $(debugPath)/,$(objects)) $<" 2> $(basename $@).err; \
-	else \
-		$(MAKE) compile OBJ='no' CFlags="$(dbgFlags) $(Flags)" out=$@ objects=$< 2> $(basename $@).err; \
-	fi;
+$(Project): $(obj)
+	@$(MAKE) directory path=$(binPath)/Release
+	@$(MAKE) compile OBJ='no' Flags="$(buildFlags)" out=$(binPath)/Release/$(Project) objects="$^"
 
+dbg$(Project): $(dobj)
+	@$(MAKE) directory path=$(binPath)/Debug
+	@$(MAKE) compile OBJ='no' Flags="$(buildFlags) $(dbgFlags)" out=$(binPath)/Debug/$(Project) objects="$^"
+
+$(objPath)/%.o: $(srcPath)/%.c
+	@$(MAKE) directory path=$(dir $@)
+	@$(MAKE) compile OBJ='yes' Flags="$(buildFlags)" out=$@ in=$<
+
+#debug
 $(debugPath)/%.o: $(srcPath)/%.c
 	@$(MAKE) directory path=$(dir $@)
-	@$(MAKE) compile OBJ='yes' CFlags="$(dbgFlags) $(Flags)" out=$@ in=$< 2> $(basename $@).err
+	@$(MAKE) compile OBJ='yes' Flags="$(dbgFlags)" out=$@ in=$< 2> $(basename $@).err
 
-$(objPath)/%.o: $(srcPath)/%.c
-	@$(MAKE) directory path=$(dir $@)
-	@$(MAKE) compile OBJ='yes' CFlags="$(wFlag) $(Flags)" out=$@ in=$<
-
-$(objPath)/%.o: $(srcPath)/%.c
-	@$(MAKE) directory path=$(dir $@)
-	@$(MAKE) compile OBJ='yes' CFlags="$(wFlag) $(Flags)" out=$@ in=$<
 
 directory:
-	@[ -d $(path) ] || $(MKDIR) $(path)
+	@[ -d $(path) ] || echo "$(LRED)Creating $(LPURPLE)Path:$(GREEN) $(path)$(NOCOLOR)"; $(MKDIR) $(path)
 
 compile:
 	@if [ $(OBJ) = 'yes' ]; then \
-		$(CC) -I $(incPath) $(CFlags) -c -o $(out) $(in); \
+		echo "$(LRED)Generating $(LPURPLE)Object $(LRED)file:$(GREEN) $(out)$(NOCOLOR)"; \
+		$(CC) -I $(incPath) $(CFlags) $(Flags) -c -o $(out) $(in); \
 	else \
-		$(CC) -I $(incPath) $(CFlags) -o $(out) $(objects); \
+		echo "$(LRED)Generating $(LPURPLE)Binary $(LRED)file:$(GREEN) $(out)$(NOCOLOR)"; \
+		$(CC) -I $(incPath) $(LFlags) $(CFlags) $(Flags) -o $(out) $(objects); \
 	fi
 
 mrproper:
+	@echo "$(LRED)Cleaning...$(NOCOLOR)"
 	@[ ! -d $(binPath)   ] || $(RM) $(binPath)/*
 	@[ ! -d $(objPath)   ] || $(RM) $(objPath)/*
 	@[ ! -d $(debugPath) ] || $(RM) $(debugPath)/*
 
 clean:
-	@$(RM) $(binPath) $(objPath) $(docPath) $(debugPath)
+	@[ ! -d $(binPath)   ] || $(RM) $(binPath)
+	@[ ! -d $(objPath)   ] || $(RM) $(objPath)
+	@[ ! -d $(debugPath) ] || $(RM) $(debugPath)
